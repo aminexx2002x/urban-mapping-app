@@ -1,0 +1,35 @@
+.geoai-frontend/
+├── .gitignore                # Specifies files and directories to be ignored by Git
+├── public/
+│   ├── index.html            # Main HTML file for the React application
+│   ├── manifest.json         # Configuration for the web app manifest
+│   └── robots.txt            # Instructions for web crawlers
+├── README.md                 # Project documentation and instructions
+├── src/
+│   ├── App.css               # Global CSS styles for the application
+│   ├── App.js                # Main React component that sets up routing
+│   ├── App.test.js           # Test file for the App component
+│   ├── components/
+│   │   ├── DashboardPage/
+│   │   │   ├── DashboardPage.css  # CSS styles for the DashboardPage component
+│   │   │   └── DashboardPage.jsx  # React component for the dashboard page
+│   │   ├── Footer/
+│   │   │   ├── Footer.css     # CSS styles for the Footer component
+│   │   │   └── Footer.jsx     # React component for the footer
+│   │   ├── LoginPage/
+│   │   │   ├── LoginPage.css  # CSS styles for the LoginPage component
+│   │   │   └── LoginPage.jsx  # React component for the login page
+│   │   ├── Navbar/
+│   │   │   ├── Navbar.css     # CSS styles for the Navbar component
+│   │   │   └── Navbar.jsx     # React component for the navigation bar
+│   │   ├── Toolbar/
+│   │   │   ├── Toolbar.css    # CSS styles for the Toolbar component (empty)
+│   │   │   └── Toolbar.js     # JavaScript file for the Toolbar component (empty)
+│   ├── contexts/
+│   │   └── UserContext.js     # Context for managing user state
+│   ├── index.css              # Global CSS styles for the application
+│   ├── index.js               # Entry point for the React application
+│   ├── reportWebVitals.js     # Performance measuring for the application
+│   └── setupTests.js          # Setup file for running tests with Jest
+├── package.json               # Project dependencies and scripts
+└── yarn.lock                  # Lock file for Yarn dependencies
