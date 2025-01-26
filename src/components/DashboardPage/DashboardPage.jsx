@@ -10,6 +10,7 @@ import "./DashboardPage.css";
 import Navbar from "../Navbar/Navbar"; // Correct path for Navbar
 import "leaflet-search"; // Import Leaflet Search plugin
 import Sidebar from "./Sidebar"; // Import Sidebar component
+import SearchBar from "./SearchBar"; // Import SearchBar component
 
 const DashboardPage = () => {
   const [drawnItems, setDrawnItems] = useState(new L.FeatureGroup());
@@ -158,10 +159,19 @@ const DashboardPage = () => {
     }
   };
 
+  // Function to handle search
+  const handleSearch = (searchTerm, coordinateSystem) => {
+    console.log(`Searching for ${searchTerm} in ${coordinateSystem} coordinate system`);
+    // Implement search functionality here
+  };
+
   return (
     <div>
       <Navbar />
       <main className="dashboard-content">
+        {/* Search Bar */}
+        <SearchBar onSearch={handleSearch} />
+
         {/* Map Container */}
         <MapContainer
           center={[28.0339, 1.6596]} // Center of Algeria
@@ -209,6 +219,7 @@ const DashboardPage = () => {
           focusOnRegion={focusOnRegion}
           isSidebarOpen={isSidebarOpen}
           toggleSidebar={toggleSidebar}
+          isMapReady={isMapReady} // Pass isMapReady to Sidebar
         />
       </main>
     </div>

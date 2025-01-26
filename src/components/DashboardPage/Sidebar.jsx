@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Sidebar.css"; // Import custom CSS for Sidebar
 
 const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expandedWilaya, toggleWilayaCommunes, focusOnRegion, isSidebarOpen, toggleSidebar }) => {
+  const [coordinateSystem, setCoordinateSystem] = useState("WGS84");
+
   return (
     <div className={`sidebar ${isSidebarOpen ? "open" : "collapsed"}`}>
       <div className="sidebar-header">
@@ -59,6 +61,13 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
         <button onClick={toggleSidebar}>
           {isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
         </button>
+        <select
+          value={coordinateSystem}
+          onChange={(e) => setCoordinateSystem(e.target.value)}
+        >
+          <option value="WGS84">WGS84</option>
+          <option value="UTM">UTM</option>
+        </select>
       </div>
     </div>
   );
