@@ -132,46 +132,6 @@ const DashboardPage = () => {
     <div>
       <Navbar />
       <main className="dashboard-content">
-        {/* Sidebar */}
-        <div className={`sidebar ${isSidebarOpen ? "open" : "collapsed"}`}>
-          <div className="sidebar-header">
-            <h3>Predefined Region Selection</h3>
-          </div>
-          <div className="sidebar-content">
-            {predefinedRegions.map((region, index) => (
-              <div key={index}>
-                <div
-                  className="region-option"
-                  onClick={() => {
-                    toggleSubRegions(region.name);
-                    focusOnRegion(region.coordinates, region.zoom); // Fly to the main region
-                  }}
-                >
-                  {region.name}
-                </div>
-                {expandedRegion === region.name && (
-                  <div className="sub-region-list">
-                    {region.subRegions.map((subRegion, subIndex) => (
-                      <div
-                        key={subIndex}
-                        className="sub-region-option"
-                        onClick={() => focusOnRegion(subRegion.coordinates, subRegion.zoom)}
-                      >
-                        {subRegion.name}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="sidebar-footer">
-            <button onClick={toggleSidebar}>
-              {isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
-            </button>
-          </div>
-        </div>
-
         {/* Map Container */}
         <MapContainer
           center={[28.0339, 1.6596]} // Center of Algeria
@@ -203,9 +163,49 @@ const DashboardPage = () => {
 
           {/* Button to toggle sidebar */}
           <div className="sidebar-toggle-button" onClick={toggleSidebar}>
-            <span>{isSidebarOpen ? "◄" : "►"}</span>
+            <span>{isSidebarOpen ? "►" : "◄"}</span>
           </div>
         </MapContainer>
+
+        {/* Sidebar on the Right */}
+        <div className={`sidebar ${isSidebarOpen ? "open" : "collapsed"}`}>
+          <div className="sidebar-header">
+            <h3>Predefined Region Selection</h3>
+          </div>
+          <div className="sidebar-content">
+            {predefinedRegions.map((region, index) => (
+              <div key={index}>
+                <div
+                  className="region-option"
+                  onClick={() => toggleSubRegions(region.name)}
+                >
+                  {region.name}
+                  <span className="dropdown-icon">
+                    {expandedRegion === region.name ? "▼" : "►"}
+                  </span>
+                </div>
+                {expandedRegion === region.name && (
+                  <div className="sub-region-list">
+                    {region.subRegions.map((subRegion, subIndex) => (
+                      <div
+                        key={subIndex}
+                        className="sub-region-option"
+                        onClick={() => focusOnRegion(subRegion.coordinates, subRegion.zoom)}
+                      >
+                        {subRegion.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="sidebar-footer">
+            <button onClick={toggleSidebar}>
+              {isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+            </button>
+          </div>
+        </div>
       </main>
     </div>
   );
