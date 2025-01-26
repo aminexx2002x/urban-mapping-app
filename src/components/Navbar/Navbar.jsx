@@ -15,8 +15,7 @@ const Navbar = () => {
         </Link>
       </div>
       <div className="navbar-links">
-        <Link to="/">Dashboard</Link>
-        <Link to="/login">Logout</Link>
+        <Link to="/login" className="logout-link">Logout</Link> {/* Add the class here */}
       </div>
     </nav>
   );

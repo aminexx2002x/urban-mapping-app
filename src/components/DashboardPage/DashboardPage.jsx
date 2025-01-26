@@ -9,11 +9,13 @@ import "leaflet-search/src/leaflet-search.css"; // Search plugin CSS
 import "./DashboardPage.css";
 import Navbar from "../Navbar/Navbar"; // Correct path for Navbar
 import "leaflet-search"; // Import Leaflet Search plugin
+import Sidebar from "./Sidebar"; // Import Sidebar component
 
 const DashboardPage = () => {
   const [drawnItems, setDrawnItems] = useState(new L.FeatureGroup());
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar is open by default
   const [expandedRegion, setExpandedRegion] = useState(null); // Track which region is expanded
+  const [expandedWilaya, setExpandedWilaya] = useState(null); // Track which Wilaya is expanded
   const [isMapReady, setIsMapReady] = useState(false); // Track if the map is ready
   const mapRef = useRef(null); // Ref to store the map object
 
@@ -24,11 +26,27 @@ const DashboardPage = () => {
       coordinates: [28.0339, 1.6596], // Center of Algeria
       zoom: 6,
       subRegions: [
-        { name: "Wilaya of Algiers", coordinates: [36.7528, 3.0588], zoom: 10 },
-        { name: "Wilaya of Batna", coordinates: [35.5559, 6.1741], zoom: 10 },
-        { name: "Wilaya of Tizi Ouzou", coordinates: [36.7167, 4.05], zoom: 10 },
-        { name: "Wilaya of Oran", coordinates: [35.6976, -0.6337], zoom: 10 },
-        { name: "Wilaya of Constantine", coordinates: [36.3654, 6.6147], zoom: 10 },
+        {
+          name: "Wilaya of Algiers",
+          coordinates: [36.7528, 3.0588],
+          zoom: 10,
+          communes: [
+            { name: "Commune of Bab El Oued", coordinates: [36.7911, 3.0575], zoom: 13 },
+            { name: "Commune of Casbah", coordinates: [36.7849, 3.0607], zoom: 13 },
+            { name: "Commune of Hussein Dey", coordinates: [36.7419, 3.0944], zoom: 13 },
+            // Add more communes as needed
+          ],
+        },
+        {
+          name: "Wilaya of Batna",
+          coordinates: [35.5559, 6.1741],
+          zoom: 10,
+          communes: [
+            { name: "Commune of Batna City", coordinates: [35.5559, 6.1741], zoom: 13 },
+            { name: "Commune of Tazoult", coordinates: [35.4833, 6.2667], zoom: 13 },
+            // Add more communes as needed
+          ],
+        },
         // Add more Wilayas as needed
       ],
     },
@@ -128,6 +146,15 @@ const DashboardPage = () => {
     }
   };
 
+  // Function to toggle Wilaya communes visibility
+  const toggleWilayaCommunes = (wilayaName) => {
+    if (expandedWilaya === wilayaName) {
+      setExpandedWilaya(null); // Collapse if already expanded
+    } else {
+      setExpandedWilaya(wilayaName); // Expand the clicked Wilaya
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -161,51 +188,25 @@ const DashboardPage = () => {
           {/* Custom Zoom Control at the Bottom */}
           <ZoomControl position="bottomright" />
 
-          {/* Button to toggle sidebar */}
-          <div className="sidebar-toggle-button" onClick={toggleSidebar}>
-            <span>{isSidebarOpen ? "►" : "◄"}</span>
-          </div>
+          {/* Button to toggle sidebar (only shown when sidebar is collapsed) */}
+          {!isSidebarOpen && (
+            <div className="sidebar-toggle-button" onClick={toggleSidebar}>
+              <span>►</span>
+            </div>
+          )}
         </MapContainer>
 
-        {/* Sidebar on the Right */}
-        <div className={`sidebar ${isSidebarOpen ? "open" : "collapsed"}`}>
-          <div className="sidebar-header">
-            <h3>Predefined Region Selection</h3>
-          </div>
-          <div className="sidebar-content">
-            {predefinedRegions.map((region, index) => (
-              <div key={index}>
-                <div
-                  className="region-option"
-                  onClick={() => toggleSubRegions(region.name)}
-                >
-                  {region.name}
-                  <span className="dropdown-icon">
-                    {expandedRegion === region.name ? "▼" : "►"}
-                  </span>
-                </div>
-                {expandedRegion === region.name && (
-                  <div className="sub-region-list">
-                    {region.subRegions.map((subRegion, subIndex) => (
-                      <div
-                        key={subIndex}
-                        className="sub-region-option"
-                        onClick={() => focusOnRegion(subRegion.coordinates, subRegion.zoom)}
-                      >
-                        {subRegion.name}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="sidebar-footer">
-            <button onClick={toggleSidebar}>
-              {isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
-            </button>
-          </div>
-        </div>
+        {/* Sidebar Component */}
+        <Sidebar
+          predefinedRegions={predefinedRegions}
+          expandedRegion={expandedRegion}
+          toggleSubRegions={toggleSubRegions}
+          expandedWilaya={expandedWilaya}
+          toggleWilayaCommunes={toggleWilayaCommunes}
+          focusOnRegion={focusOnRegion}
+          isSidebarOpen={isSidebarOpen}
+          toggleSidebar={toggleSidebar}
+        />
       </main>
     </div>
   );

@@ -1,3 +1,4 @@
+/* Navbar Styles */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -23,7 +24,26 @@
 .navbar-links a:hover {
   text-decoration: underline;
 }
+
 .navbar-logo {
   height: 50px;  /* Adjust the height to make the logo smaller */
   width: auto;   /* Keep the aspect ratio intact */
+}
+
+/* Style for the Logout link */
+.navbar-links .logout-link {
+  font-weight: bold; /* Make the text bold */
+  padding: 8px 16px; /* Add padding for the rectangle */
+  background-color: red; /* Fill the rectangle with red */
+  color: white; /* Text color (white for contrast) */
+  border: 2px solid red; /* Add a border (optional, can match the background) */
+  border-radius: 12px; /* Add border radius */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+  text-decoration: none; /* Remove underline */
+}
+
+.navbar-links .logout-link:hover {
+  background-color: rgb(255, 255, 255); /* Darker red on hover */
+  border-color: rgb(255, 255, 255); /* Match border color with background */
+  color: red; /* Keep text color white */
 }

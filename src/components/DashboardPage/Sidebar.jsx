@@ -1,0 +1,64 @@
+import React from "react";
+import "./Sidebar.css"; // Import custom CSS for Sidebar
+
+const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expandedWilaya, toggleWilayaCommunes, focusOnRegion, isSidebarOpen, toggleSidebar }) => {
+  return (
+    <div className={`sidebar ${isSidebarOpen ? "open" : "collapsed"}`}>
+      <div className="sidebar-header">
+        <h3>Predefined Region Selection</h3>
+      </div>
+      <div className="sidebar-content">
+        {predefinedRegions.map((region, index) => (
+          <div key={index}>
+            <div
+              className="region-option"
+              onClick={() => toggleSubRegions(region.name)}
+            >
+              {region.name}
+              <span className="dropdown-icon">
+                {expandedRegion === region.name ? "▼" : "►"}
+              </span>
+            </div>
+            {expandedRegion === region.name && (
+              <div className="sub-region-list">
+                {region.subRegions.map((subRegion, subIndex) => (
+                  <div key={subIndex}>
+                    <div
+                      className="wilaya-option"
+                      onClick={() => toggleWilayaCommunes(subRegion.name)}
+                    >
+                      {subRegion.name}
+                      <span className="dropdown-icon">
+                        {expandedWilaya === subRegion.name ? "▼" : "►"}
+                      </span>
+                    </div>
+                    {expandedWilaya === subRegion.name && (
+                      <div className="commune-list">
+                        {subRegion.communes.map((commune, communeIndex) => (
+                          <div
+                            key={communeIndex}
+                            className="commune-option"
+                            onClick={() => focusOnRegion(commune.coordinates, commune.zoom)}
+                          >
+                            {commune.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="sidebar-footer">
+        <button onClick={toggleSidebar}>
+          {isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Sidebar;

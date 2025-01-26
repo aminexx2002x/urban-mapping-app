@@ -1,0 +1,101 @@
+
+/* Sidebar on the Right */
+.sidebar {
+    width: 300px;
+    height: 100%;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, display 0.3s ease;
+    z-index: 1000;
+    position: absolute;
+    right: 0;
+  }
+  
+  .sidebar.collapsed {
+    transform: translateX(100%);
+    display: none; /* Hide the sidebar when collapsed */
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+    display: block; /* Show the sidebar when open */
+  }
+  
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .sidebar-content {
+    padding: 20px;
+  }
+  
+  .region-option,
+  .wilaya-option,
+  .commune-option {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .region-option:hover,
+  .wilaya-option:hover,
+  .commune-option:hover {
+    background-color: #e9e9e9;
+  }
+  
+  .dropdown-icon {
+    font-size: 12px;
+  }
+  
+  .sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .sidebar-footer button {
+    background-color: #004ba0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .sidebar-footer button:hover {
+    background-color: #003278;
+  }
+  
+  /* Sidebar Toggle Button */
+  .sidebar-toggle-button {
+    position: absolute;
+    top: 70px;
+    right: 10px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    z-index: 1001;
+  }
+  
+  .sidebar-toggle-button:hover {
+    background-color: #f0f0f0;
+  }
+  
+/* Sub-Region List */
+.sub-region-list {
+    margin-left: 20px; /* Indent sub-regions */
+    margin-top: 5px;
+  }
+  
+  .commune-list {
+    margin-left: 20px; /* Indent communes */
+    margin-top: 5px;
+  }
