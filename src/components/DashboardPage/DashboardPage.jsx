@@ -131,7 +131,10 @@ const DashboardPage = () => {
   const focusOnRegion = (coordinates, zoom) => {
     if (mapRef.current) {
       console.log("Flying to:", coordinates, "with zoom:", zoom); // Debugging
-      mapRef.current.flyTo(coordinates, zoom); // Smoothly fly to the region
+      mapRef.current.flyTo(coordinates, zoom, {
+        animate: true,
+        duration: 1.5, // Duration of the fly-to animation in seconds
+      }); // Smoothly fly to the region
     } else {
       console.error("Map is not initialized!"); // Debugging
     }

@@ -25,7 +25,10 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
                   <div key={subIndex}>
                     <div
                       className="wilaya-option"
-                      onClick={() => toggleWilayaCommunes(subRegion.name)}
+                      onClick={() => {
+                        toggleWilayaCommunes(subRegion.name);
+                        focusOnRegion(subRegion.coordinates, subRegion.zoom);
+                      }}
                     >
                       {subRegion.name}
                       <span className="dropdown-icon">
