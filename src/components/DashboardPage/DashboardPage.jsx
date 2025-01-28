@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import L from "leaflet";
-import { MapContainer, TileLayer, LayersControl, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, LayersControl, ZoomControl, FeatureGroup } from "react-leaflet";
+import { EditControl } from "react-leaflet-draw";
 import axios from "axios"; // For HTTP requests
-import "leaflet-draw";
-import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import "leaflet/dist/leaflet.css";
 import "leaflet-search/src/leaflet-search.css"; // Search plugin CSS
 import "./DashboardPage.css";
 import Navbar from "../Navbar/Navbar"; // Correct path for Navbar
 import "leaflet-search"; // Import Leaflet Search plugin
 import Sidebar from "./Sidebar"; // Import Sidebar component
 import SearchBar from "./SearchBar"; // Import SearchBar component
+import sidebarButtonIcon from "../../assets/tools/sidebar_button.svg"; // Import the SVG icon
 
 const DashboardPage = () => {
   const [drawnItems, setDrawnItems] = useState(new L.FeatureGroup());
@@ -77,20 +78,6 @@ const DashboardPage = () => {
       const map = mapRef.current;
       map.addLayer(drawnItems);
 
-      const drawControl = new L.Control.Draw({
-        edit: {
-          featureGroup: drawnItems,
-          remove: true,
-        },
-      });
-
-      map.addControl(drawControl);
-
-      map.on("draw:created", (e) => {
-        const layer = e.layer;
-        drawnItems.addLayer(layer);
-      });
-
       const searchControl = new L.Control.Search({
         layer: drawnItems,
         initial: false,
@@ -101,6 +88,11 @@ const DashboardPage = () => {
 
       // Fetch GeoJSON data (countries, cities, etc.)
       fetchGeoJSONData(map);
+
+      // Disable right-click context menu on the map
+      map.getContainer().addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
     }
   }, [drawnItems, isMapReady]);
 
@@ -174,6 +166,7 @@ const DashboardPage = () => {
 
         {/* Map Container */}
         <MapContainer
+          className="map-container"
           center={[28.0339, 1.6596]} // Center of Algeria
           zoom={6} // Zoom level to show all of Algeria
           style={{ flex: 1 }}
@@ -201,11 +194,37 @@ const DashboardPage = () => {
           {/* Custom Zoom Control at the Bottom */}
           <ZoomControl position="bottomright" />
 
+          {/* Polygon Drawing Tool */}
+          <FeatureGroup>
+            <EditControl
+              position="topright"
+              onCreated={(e) => {
+                const layer = e.layer;
+                drawnItems.addLayer(layer);
+              }}
+              draw={{
+                rectangle: true,
+                circle: true,
+                polyline: true,
+                polygon: true,
+                marker: true,
+                circlemarker: true,
+              }}
+              edit={{
+                featureGroup: drawnItems,
+                remove: true,
+              }}
+            />
+          </FeatureGroup>
+
           {/* Button to toggle sidebar (only shown when sidebar is collapsed) */}
           {!isSidebarOpen && (
-            <div className="sidebar-toggle-button" onClick={toggleSidebar}>
-              <span>►</span>
-            </div>
+            <img
+              src={sidebarButtonIcon}
+              alt="Toggle Sidebar"
+              className="sidebar-toggle-button"
+              onClick={toggleSidebar}
+            />
           )}
         </MapContainer>
 

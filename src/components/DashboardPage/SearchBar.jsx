@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import SearchIcon from '@mui/icons-material/Search'; // Import MUI Search Icon
 import "./SearchBar.css"; // Import custom CSS for SearchBar
 
 const SearchBar = ({ onSearch }) => {
@@ -13,11 +14,14 @@ const SearchBar = ({ onSearch }) => {
     <div className="search-bar">
       <input
         type="text"
-        placeholder="Search..."
+        placeholder="Search Google Maps"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        aria-label="Search"
       />
-      <button onClick={handleSearch}>Search</button>
+      <button onClick={handleSearch} aria-label="Search Button">
+        <SearchIcon className="search-icon" />
+      </button>
     </div>
   );
 };

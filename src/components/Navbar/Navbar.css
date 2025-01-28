@@ -3,37 +3,41 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 8px 10px;
   background-color: #002855;
   color: white;
+  height: 56px; /* Set a consistent height */
+
 }
 
 .navbar-brand a {
-  color: white;
+  color: rgb(255, 255, 255);
   text-decoration: none;
   font-size: 24px;
   font-weight: bold;
 }
 
 .navbar-links a {
-  color: white;
+  color: rgb(255, 255, 255);
   text-decoration: none;
   margin-left: 20px;
 }
 
 .navbar-links a:hover {
-  text-decoration: underline;
+  text-decoration: wavy;
 }
 
 .navbar-logo {
-  height: 50px;  /* Adjust the height to make the logo smaller */
+  height: 40px;  /* Adjust the height to make the logo smaller */
   width: auto;   /* Keep the aspect ratio intact */
+  padding-top: 6px;
 }
 
 /* Style for the Logout link */
 .navbar-links .logout-link {
   font-weight: bold; /* Make the text bold */
-  padding: 8px 16px; /* Add padding for the rectangle */
+  padding: 4px 8px; /* Reduce padding for a smaller button */
+  font-size: 12px; /* Reduce font size */
   background-color: red; /* Fill the rectangle with red */
   color: white; /* Text color (white for contrast) */
   border: 2px solid red; /* Add a border (optional, can match the background) */
@@ -45,5 +49,5 @@
 .navbar-links .logout-link:hover {
   background-color: rgb(255, 255, 255); /* Darker red on hover */
   border-color: rgb(255, 255, 255); /* Match border color with background */
-  color: red; /* Keep text color white */
+  color: red; /* Change text color to red */
 }
