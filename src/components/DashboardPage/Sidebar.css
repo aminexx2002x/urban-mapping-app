@@ -1,7 +1,6 @@
 .sidebar {
   width: 300px;
   height: calc(100vh - 56px); /* Full height minus navbar */
-  overflow: hidden; /* Prevent scrolling */
   background-color: white;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, display 0.3s ease;
@@ -9,6 +8,7 @@
   position: fixed;
   right: 0;
   top: 56px; /* Align below the navbar */
+  overflow: hidden; /* Prevent scrolling on the entire sidebar */
 }
 
 .sidebar.collapsed {
@@ -28,11 +28,12 @@
 
 .sidebar-content {
   padding: 20px;
-  overflow: hidden; /* Prevent scrolling */
-  flex-grow: 1;
+  font-size: 12px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: calc(100% - 80px); /* Adjust height to account for header and footer */
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Distribute space evenly */
+  justify-content: flex-start; /* Align content to the top */
 }
 
 .region-option,
@@ -88,4 +89,15 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   width: 100%;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-container .MuiSvgIcon-root {
+  font-size: 24px; /* Adjust size as needed */
+  color: #333; /* Adjust color as needed */
 }

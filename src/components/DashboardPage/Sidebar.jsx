@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import the expand icon
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'; // Import the collapse icon
 import "./Sidebar.css"; // Import custom CSS for Sidebar
 
 const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expandedWilaya, toggleWilayaCommunes, focusOnRegion, isSidebarOpen, toggleSidebar }) => {
@@ -18,7 +20,7 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
             >
               {region.name}
               <span className="dropdown-icon">
-                {expandedRegion === region.name ? "▼" : "►"}
+                {expandedRegion === region.name ? <ExpandMoreIcon /> : <ChevronRightIcon />}
               </span>
             </div>
             {expandedRegion === region.name && (
@@ -34,7 +36,7 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
                     >
                       {subRegion.name}
                       <span className="dropdown-icon">
-                        {expandedWilaya === subRegion.name ? "▼" : "►"}
+                        {expandedWilaya === subRegion.name ? <ExpandMoreIcon /> : <ChevronRightIcon />}
                       </span>
                     </div>
                     {expandedWilaya === subRegion.name && (

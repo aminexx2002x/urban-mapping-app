@@ -13,6 +13,15 @@ import Sidebar from "./Sidebar"; // Import Sidebar component
 import SearchBar from "./SearchBar"; // Import SearchBar component
 import sidebarButtonIcon from "../../assets/tools/sidebar_button.svg"; // Import the SVG icon
 
+// Fix for default icon path issues
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
+
 const DashboardPage = () => {
   const [drawnItems, setDrawnItems] = useState(new L.FeatureGroup());
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar is open by default
@@ -25,52 +34,110 @@ const DashboardPage = () => {
   const predefinedRegions = [
     {
       name: "Administrative Regions",
-      coordinates: [28.0339, 1.6596], // Center of Algeria
+      coordinates: [28.0339, 1.6596],
       zoom: 6,
       subRegions: [
         {
-          name: "Wilaya of Algiers",
+          name: "Wilayas",
           coordinates: [36.7528, 3.0588],
           zoom: 10,
           communes: [
-            { name: "Commune of Bab El Oued", coordinates: [36.7911, 3.0575], zoom: 13 },
-            { name: "Commune of Casbah", coordinates: [36.7849, 3.0607], zoom: 13 },
-            { name: "Commune of Hussein Dey", coordinates: [36.7419, 3.0944], zoom: 13 },
-            // Add more communes as needed
+            { name: "Algiers", coordinates: [36.7528, 3.0588], zoom: 13 },
+            { name: "Oran", coordinates: [35.6971, -0.6308], zoom: 13 },
+            { name: "Tamanrasset", coordinates: [22.785, 5.5228], zoom: 13 },
+            { name: "Constantine", coordinates: [36.365, 6.6147], zoom: 13 },
+            // Add more Wilayas as needed
           ],
         },
         {
-          name: "Wilaya of Batna",
-          coordinates: [35.5559, 6.1741],
+          name: "Dairas",
+          coordinates: [36.7528, 3.0588],
           zoom: 10,
           communes: [
-            { name: "Commune of Batna City", coordinates: [35.5559, 6.1741], zoom: 13 },
-            { name: "Commune of Tazoult", coordinates: [35.4833, 6.2667], zoom: 13 },
-            // Add more communes as needed
+            // Add Dairas here
           ],
         },
-        // Add more Wilayas as needed
+        {
+          name: "Communes",
+          coordinates: [36.7528, 3.0588],
+          zoom: 10,
+          communes: [
+            // Add Communes here
+          ],
+        },
       ],
     },
     {
       name: "Geographical Zones",
-      coordinates: [27.7000, 0.2833], // Adrar (Sahara Desert)
+      coordinates: [27.7000, 0.2833],
       zoom: 6,
       subRegions: [
-        { name: "Sahara Desert", coordinates: [27.7000, 0.2833], zoom: 6 },
-        { name: "Atlas Mountains", coordinates: [36.4621, 2.7387], zoom: 6 },
+        { name: "Sahara Desert Zones", coordinates: [27.7000, 0.2833], zoom: 6 },
+        { name: "Mountain Ranges", coordinates: [35.5559, 6.1741], zoom: 6 },
+        { name: "Plateaus", coordinates: [34.5559, 5.1741], zoom: 6 },
+        { name: "Coastal Areas", coordinates: [36.7528, 3.0588], zoom: 6 },
       ],
     },
     {
-      name: "Environmental Regions",
-      coordinates: [36.7528, 3.0588], // Algiers (Coastal Areas)
+      name: "Environmental and Ecological Regions",
+      coordinates: [36.7528, 3.0588],
       zoom: 6,
       subRegions: [
-        { name: "Coastal Areas", coordinates: [36.7528, 3.0588], zoom: 6 },
-        { name: "Highlands", coordinates: [36.3654, 6.6147], zoom: 6 },
+        { name: "National Parks", coordinates: [36.7528, 3.0588], zoom: 6 },
+        { name: "Wetlands", coordinates: [36.3654, 6.6147], zoom: 6 },
+        { name: "Forested Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
       ],
     },
-    // Add more regions and sub-regions as needed
+    {
+      name: "Strategic and Operational Regions",
+      coordinates: [36.7528, 3.0588],
+      zoom: 6,
+      subRegions: [
+        { name: "Military Zones", coordinates: [36.7528, 3.0588], zoom: 6 },
+        { name: "Urban Growth Areas", coordinates: [36.3654, 6.6147], zoom: 6 },
+        { name: "Satellite Coverage Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
+      ],
+    },
+    {
+      name: "Geological and Resource Regions",
+      coordinates: [36.7528, 3.0588],
+      zoom: 6,
+      subRegions: [
+        { name: "Mining Areas", coordinates: [36.7528, 3.0588], zoom: 6 },
+        { name: "Oil and Gas Fields", coordinates: [36.3654, 6.6147], zoom: 6 },
+        { name: "Hydrographic Basins", coordinates: [36.3654, 6.6147], zoom: 6 },
+      ],
+    },
+    {
+      name: "Meteorological and Climate Zones",
+      coordinates: [36.7528, 3.0588],
+      zoom: 6,
+      subRegions: [
+        { name: "Climatic Zones", coordinates: [36.7528, 3.0588], zoom: 6 },
+        { name: "Drought-Prone Areas", coordinates: [36.3654, 6.6147], zoom: 6 },
+        { name: "Flood Risk Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
+      ],
+    },
+    {
+      name: "Historical and Cultural Regions",
+      coordinates: [36.7528, 3.0588],
+      zoom: 6,
+      subRegions: [
+        { name: "UNESCO Heritage Sites", coordinates: [36.7528, 3.0588], zoom: 6 },
+        { name: "Historical Trade Routes", coordinates: [36.3654, 6.6147], zoom: 6 },
+        { name: "Cultural Clusters", coordinates: [36.3654, 6.6147], zoom: 6 },
+      ],
+    },
+    {
+      name: "Customized and User-Defined Regions",
+      coordinates: [36.7528, 3.0588],
+      zoom: 6,
+      subRegions: [
+        { name: "Satellite Data Coverage", coordinates: [36.7528, 3.0588], zoom: 6 },
+        { name: "Buffer Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
+        { name: "Conflict or Disaster Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -161,10 +228,16 @@ const DashboardPage = () => {
     <div>
       <Navbar />
       <main className="dashboard-content">
-        {/* Search Bar */}
-        <SearchBar onSearch={handleSearch} />
+        <div className="header-container">
+          <SearchBar onSearch={handleSearch} />
+          <img
+            src={sidebarButtonIcon}
+            alt="Toggle Sidebar"
+            className="sidebar-toggle-button"
+            onClick={toggleSidebar}
+          />
+        </div>
 
-        {/* Map Container */}
         <MapContainer
           className="map-container"
           center={[28.0339, 1.6596]} // Center of Algeria
@@ -216,19 +289,8 @@ const DashboardPage = () => {
               }}
             />
           </FeatureGroup>
-
-          {/* Button to toggle sidebar (only shown when sidebar is collapsed) */}
-          {!isSidebarOpen && (
-            <img
-              src={sidebarButtonIcon}
-              alt="Toggle Sidebar"
-              className="sidebar-toggle-button"
-              onClick={toggleSidebar}
-            />
-          )}
         </MapContainer>
 
-        {/* Sidebar Component */}
         <Sidebar
           predefinedRegions={predefinedRegions}
           expandedRegion={expandedRegion}
@@ -238,7 +300,7 @@ const DashboardPage = () => {
           focusOnRegion={focusOnRegion}
           isSidebarOpen={isSidebarOpen}
           toggleSidebar={toggleSidebar}
-          isMapReady={isMapReady} // Pass isMapReady to Sidebar
+          isMapReady={isMapReady}
         />
       </main>
     </div>

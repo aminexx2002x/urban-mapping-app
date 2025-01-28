@@ -12,16 +12,16 @@ const SearchBar = ({ onSearch }) => {
 
   return (
     <div className="search-bar">
+      <button onClick={handleSearch} aria-label="Search Button">
+        <SearchIcon className="search-icon" />
+      </button>
       <input
         type="text"
-        placeholder="Search Google Maps"
+        placeholder="Search Urban Mapping"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         aria-label="Search"
       />
-      <button onClick={handleSearch} aria-label="Search Button">
-        <SearchIcon className="search-icon" />
-      </button>
     </div>
   );
 };

@@ -12,7 +12,7 @@
 }
 /* Move the layer control to the left with a margin-top of 10px */
 .leaflet-control-layers {
-  margin-top: 80px !important; /* Add margin to the top */
+  margin-top: 70px !important; /* Add margin to the top */
   margin-left: 10px !important; /* Add margin to the left */
 
 }
@@ -93,8 +93,8 @@
 /* Sidebar Toggle Button */
 .sidebar-toggle-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 20px;
+  right: 830px;
   width: 40px;
   height: 40px;
   cursor: pointer;
