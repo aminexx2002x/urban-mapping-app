@@ -28,6 +28,7 @@ const DashboardPage = () => {
   const [expandedRegion, setExpandedRegion] = useState(null); // Track which region is expanded
   const [expandedWilaya, setExpandedWilaya] = useState(null); // Track which Wilaya is expanded
   const [isMapReady, setIsMapReady] = useState(false); // Track if the map is ready
+  const [searchResults, setSearchResults] = useState([]);
   const mapRef = useRef(null); // Ref to store the map object
 
   // Predefined regions within Algeria
@@ -140,6 +141,30 @@ const DashboardPage = () => {
     },
   ];
 
+  const handleSearch = async (searchTerm) => {
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${searchTerm}`);
+      setSearchResults(response.data.map((result) => ({
+        name: result.display_name,
+        lat: result.lat,
+        lon: result.lon,
+      })));
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
+  };
+
+  const handleSelectResult = (result) => {
+    if (mapRef.current) {
+      const { lat, lon } = result;
+      mapRef.current.flyTo([lat, lon], 15, {
+        animate: true,
+        duration: 1.5,
+      });
+      L.marker([lat, lon]).addTo(mapRef.current).bindPopup(result.name).openPopup();
+    }
+  };
+
   useEffect(() => {
     if (mapRef.current && isMapReady) {
       const map = mapRef.current;
@@ -218,12 +243,6 @@ const DashboardPage = () => {
     }
   };
 
-  // Function to handle search
-  const handleSearch = (searchTerm, coordinateSystem) => {
-    console.log(`Searching for ${searchTerm} in ${coordinateSystem} coordinate system`);
-    // Implement search functionality here
-  };
-
   return (
     <div>
       <Navbar />
@@ -250,10 +269,16 @@ const DashboardPage = () => {
           zoomControl={false} // Disable default zoom control
         >
           <LayersControl position="topright">
-            <LayersControl.BaseLayer checked name="Satellite">
+            <LayersControl.BaseLayer name="Google Satellite">
               <TileLayer
-                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                attribution='&copy; <a href="https://www.esri.com/en-us/arcgis/products/arcgis-online/overview">Esri</a>'
+                url="http://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+                attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+              />
+            </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer checked name="Google Hybrid">
+              <TileLayer
+                url="http://mt0.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+                attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
               />
             </LayersControl.BaseLayer>
             <LayersControl.BaseLayer name="Street Map">

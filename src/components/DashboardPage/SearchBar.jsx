@@ -4,10 +4,20 @@ import "./SearchBar.css"; // Import custom CSS for SearchBar
 
 const SearchBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [coordinateSystem, setCoordinateSystem] = useState("WGS84");
+  const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = () => {
-    onSearch(searchTerm, coordinateSystem);
+  const handleSearch = async (event) => {
+    event.preventDefault();
+    if (searchTerm.trim()) {
+      const results = await onSearch(searchTerm);
+      setSearchResults(results);
+    }
+  };
+
+  const handleSelectResult = (result) => {
+    setSearchTerm(result.name);
+    setSearchResults([]);
+    // Handle result selection logic here
   };
 
   return (
@@ -22,6 +32,15 @@ const SearchBar = ({ onSearch }) => {
         onChange={(e) => setSearchTerm(e.target.value)}
         aria-label="Search"
       />
+      {searchResults.length > 0 && (
+        <ul className="search-results-dropdown">
+          {searchResults.map((result, index) => (
+            <li key={index} onClick={() => handleSelectResult(result)}>
+              {result.name}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
