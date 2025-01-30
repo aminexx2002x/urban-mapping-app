@@ -1,41 +1,29 @@
 import React, { useState } from "react";
-import SearchIcon from '@mui/icons-material/Search'; // Import MUI Search Icon
 import "./SearchBar.css"; // Import custom CSS for SearchBar
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, searchResults, onSelectResult }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = async (event) => {
-    event.preventDefault();
-    if (searchTerm.trim()) {
-      const results = await onSearch(searchTerm);
-      setSearchResults(results);
+  const handleInputChange = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    if (term.length > 2) { // Start searching after 3 characters
+      onSearch(term);
     }
-  };
-
-  const handleSelectResult = (result) => {
-    setSearchTerm(result.name);
-    setSearchResults([]);
-    // Handle result selection logic here
   };
 
   return (
     <div className="search-bar">
-      <button onClick={handleSearch} aria-label="Search Button">
-        <SearchIcon className="search-icon" />
-      </button>
       <input
         type="text"
-        placeholder="Search Urban Mapping"
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        aria-label="Search"
+        onChange={handleInputChange}
+        placeholder="Search for a place..."
       />
       {searchResults.length > 0 && (
-        <ul className="search-results-dropdown">
+        <ul className="search-results">
           {searchResults.map((result, index) => (
-            <li key={index} onClick={() => handleSelectResult(result)}>
+            <li key={index} onClick={() => onSelectResult(result)}>
               {result.name}
             </li>
           ))}

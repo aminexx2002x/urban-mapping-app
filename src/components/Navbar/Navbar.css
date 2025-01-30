@@ -6,8 +6,7 @@
   padding: 8px 10px;
   background-color: #002855;
   color: white;
-  height: 56px; /* Set a consistent height */
-
+  height: 65px; /* Set a consistent height */
 }
 
 .navbar-brand a {
@@ -28,7 +27,7 @@
 }
 
 .navbar-logo {
-  height: 40px;  /* Adjust the height to make the logo smaller */
+  height: 50px;  /* Adjust the height to make the logo smaller */
   width: auto;   /* Keep the aspect ratio intact */
   padding-top: 6px;
 }

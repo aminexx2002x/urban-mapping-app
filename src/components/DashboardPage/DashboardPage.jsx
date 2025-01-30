@@ -161,7 +161,9 @@ const DashboardPage = () => {
         animate: true,
         duration: 1.5,
       });
-      L.marker([lat, lon]).addTo(mapRef.current).bindPopup(result.name).openPopup();
+      // Add a marker at the selected location
+      const marker = L.marker([lat, lon]).addTo(mapRef.current);
+      marker.bindPopup(result.name).openPopup();
     }
   };
 
@@ -248,8 +250,7 @@ const DashboardPage = () => {
       <Navbar />
       <main className="dashboard-content">
         <div className="header-container">
-          <SearchBar onSearch={handleSearch} />
-          <img
+        <SearchBar onSearch={handleSearch} searchResults={searchResults} onSelectResult={handleSelectResult} />        <img
             src={sidebarButtonIcon}
             alt="Toggle Sidebar"
             className="sidebar-toggle-button"

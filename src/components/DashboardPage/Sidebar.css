@@ -1,13 +1,13 @@
 .sidebar {
   width: 300px;
-  height: calc(100vh - 56px); /* Full height minus navbar */
+  height: calc(100vh - 65px); /* Full height minus navbar */
   background-color: white;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, display 0.3s ease;
   z-index: 1000;
   position: fixed;
   right: 0;
-  top: 56px; /* Align below the navbar */
+  top: 65px; /* Align below the navbar */
   overflow: hidden; /* Prevent scrolling on the entire sidebar */
 }
 
@@ -100,4 +100,58 @@
 .icon-container .MuiSvgIcon-root {
   font-size: 24px; /* Adjust size as needed */
   color: #333; /* Adjust color as needed */
+}
+
+/* Navbar Styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background-color: #002855;
+  color: white;
+  height: 65px; /* Set a consistent height */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow effect */
+}
+
+.navbar-brand a {
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navbar-links a {
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+  margin-left: 20px;
+}
+
+.navbar-links a:hover {
+  text-decoration: wavy;
+}
+
+.navbar-logo {
+  height: 50px;  /* Adjust the height to make the logo smaller */
+  width: auto;   /* Keep the aspect ratio intact */
+  padding-top: 6px;
+}
+
+/* Style for the Logout link */
+.navbar-links .logout-link {
+  font-weight: bold; /* Make the text bold */
+  padding: 4px 8px; /* Reduce padding for a smaller button */
+  font-size: 12px; /* Reduce font size */
+  background-color: red; /* Fill the rectangle with red */
+  color: white; /* Text color (white for contrast) */
+  border: 2px solid red; /* Add a border (optional, can match the background) */
+  border-radius: 12px; /* Add border radius */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+  text-decoration: none; /* Remove underline */
+}
+
+.navbar-links .logout-link:hover {
+  background-color: rgb(255, 255, 255); /* Darker red on hover */
+  border-color: rgb(255, 255, 255); /* Match border color with background */
+  color: red; /* Change text color to red */
 }

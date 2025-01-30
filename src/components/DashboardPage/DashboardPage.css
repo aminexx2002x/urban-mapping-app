@@ -104,7 +104,7 @@
 /* Map Container */
 .leaflet-container {
   flex: 1;
-  height: calc(100vh - 56px); /* Adjust for navbar height */
+  height: calc(100vh - 65px); /* Adjust for navbar height */
   overflow: hidden; /* Prevent scrolling */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
@@ -125,4 +125,60 @@
 .commune-list {
   margin-left: 20px; /* Indent communes */
   margin-top: 5px;
+}
+.search-bar-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px; /* Adjust as needed */
+  margin: 0 auto; /* Center the search bar */
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%; /* Position directly below the search input */
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 0 0 26px 26px;
+  max-height: 300px; /* Limit the height of the dropdown */
+  overflow-y: auto; /* Add scroll if results exceed max height */
+  z-index: 1000; /* Ensure dropdown is above other elements */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-results li {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-results li:hover {
+  background-color: #f0f0f0;
+}
+
+.icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.result-name {
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
