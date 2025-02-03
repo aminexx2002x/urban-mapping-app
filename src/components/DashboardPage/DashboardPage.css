@@ -129,8 +129,9 @@
 .search-bar-container {
   position: relative;
   width: 100%;
-  max-width: 400px; /* Adjust as needed */
+  max-width: 400; /* Adjust as needed */
   margin: 0 auto; /* Center the search bar */
+
 }
 
 .search-input {
