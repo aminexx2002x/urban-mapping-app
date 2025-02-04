@@ -288,6 +288,12 @@ const DashboardPage = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               />
             </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer name="ESRI Satellite">
+              <TileLayer
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                attribution='&copy; <a href="https://www.esri.com">ESRI</a>'
+              />
+            </LayersControl.BaseLayer>
           </LayersControl>
 
           {/* Custom Zoom Control at the Bottom */}
