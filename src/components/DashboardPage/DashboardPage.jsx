@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import L from "leaflet";
-import { MapContainer, TileLayer, LayersControl, ZoomControl, FeatureGroup } from "react-leaflet";
+import { MapContainer, TileLayer, LayersControl, ZoomControl, FeatureGroup, useMapEvents } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import axios from "axios"; // For HTTP requests
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -12,6 +12,7 @@ import "leaflet-search"; // Import Leaflet Search plugin
 import Sidebar from "./Sidebar"; // Import Sidebar component
 import SearchBar from "./SearchBar"; // Import SearchBar component
 import sidebarButtonIcon from "../../assets/tools/sidebar_button.svg"; // Import the SVG icon
+import CoordinatesDisplay from "./CoordinatesDisplay";
 
 // Fix for default icon path issues
 delete L.Icon.Default.prototype._getIconUrl;
@@ -30,6 +31,7 @@ const DashboardPage = () => {
   const [isMapReady, setIsMapReady] = useState(false); // Track if the map is ready
   const [searchResults, setSearchResults] = useState([]);
   const mapRef = useRef(null); // Ref to store the map object
+  const [coordinates, setCoordinates] = useState(null);
 
   // Predefined regions within Algeria
   const predefinedRegions = [
@@ -245,12 +247,23 @@ const DashboardPage = () => {
     }
   };
 
+  const MapEvents = () => {
+    useMapEvents({
+      mousemove: (event) => {
+        const { lat, lng } = event.latlng;
+        setCoordinates({ lat, lng });
+      },
+    });
+    return null;
+  };
+
   return (
     <div>
       <Navbar />
       <main className="dashboard-content">
         <div className="header-container">
-        <SearchBar onSearch={handleSearch} searchResults={searchResults} onSelectResult={handleSelectResult} />        <img
+          <SearchBar onSearch={handleSearch} searchResults={searchResults} onSelectResult={handleSelectResult} />
+          <img
             src={sidebarButtonIcon}
             alt="Toggle Sidebar"
             className="sidebar-toggle-button"
@@ -321,6 +334,8 @@ const DashboardPage = () => {
               }}
             />
           </FeatureGroup>
+
+          <MapEvents />
         </MapContainer>
 
         <Sidebar
@@ -334,6 +349,8 @@ const DashboardPage = () => {
           toggleSidebar={toggleSidebar}
           isMapReady={isMapReady}
         />
+
+        <CoordinatesDisplay coordinates={coordinates} />
       </main>
     </div>
   );
