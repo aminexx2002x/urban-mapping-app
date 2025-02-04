@@ -7485,6 +7485,7 @@ __metadata:
     leaflet-draw: "npm:^1.0.4"
     leaflet-search: "npm:^4.0.0"
     lucide-react: "npm:^0.469.0"
+    proj4: "npm:^2.15.0"
     prop-types: "npm:^15.8.1"
     react: "npm:18.0.0"
     react-bootstrap: "npm:^2.10.8"
@@ -9909,6 +9910,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mgrs@npm:1.0.0":
+  version: 1.0.0
+  resolution: "mgrs@npm:1.0.0"
+  checksum: 10c0/a360853be5a3b4f4734dbf0a193851c08039ccb6077362ab0f890cccd170ef88b59585129757da9fea4d7a313d7dc3ee88f37f594fc1ae3e4e8efc5353144d77
+  languageName: node
+  linkType: hard
+
 "micromatch@npm:^4.0.2, micromatch@npm:^4.0.4, micromatch@npm:^4.0.5, micromatch@npm:^4.0.8":
   version: 4.0.8
   resolution: "micromatch@npm:4.0.8"
@@ -11697,6 +11705,16 @@ __metadata:
   version: 2.0.1
   resolution: "process-nextick-args@npm:2.0.1"
   checksum: 10c0/bec089239487833d46b59d80327a1605e1c5287eaad770a291add7f45fda1bb5e28b38e0e061add0a1d0ee0984788ce74fa394d345eed1c420cacf392c554367
+  languageName: node
+  linkType: hard
+
+"proj4@npm:^2.15.0":
+  version: 2.15.0
+  resolution: "proj4@npm:2.15.0"
+  dependencies:
+    mgrs: "npm:1.0.0"
+    wkt-parser: "npm:^1.4.0"
+  checksum: 10c0/01c0ef831247e08f4e0fce3193033913ca07be0301522bdefddabe1bb783b947bf731425f0aa6b14a01ee546f90cd6301a3eefed859afad3345884d1d01ec8f4
   languageName: node
   linkType: hard
 
@@ -14564,6 +14582,13 @@ __metadata:
   bin:
     node-which: bin/which.js
   checksum: 10c0/e556e4cd8b7dbf5df52408c9a9dd5ac6518c8c5267c8953f5b0564073c66ed5bf9503b14d876d0e9c7844d4db9725fb0dcf45d6e911e17e26ab363dc3965ae7b
+  languageName: node
+  linkType: hard
+
+"wkt-parser@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "wkt-parser@npm:1.4.0"
+  checksum: 10c0/4046fd355ddc626e6ea71f5a05e670bd3d6dc65dc0f8b10f2e9381ea6bd61cb90379389b0fb52337de9330788405dd0590b57e01b2c85f6f471acc794713243b
   languageName: node
   linkType: hard
 
