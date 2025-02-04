@@ -13,6 +13,7 @@ import Sidebar from "./Sidebar"; // Import Sidebar component
 import SearchBar from "./SearchBar"; // Import SearchBar component
 import sidebarButtonIcon from "../../assets/tools/sidebar_button.svg"; // Import the SVG icon
 import CoordinatesDisplay from "./CoordinatesDisplay";
+import { convertToUTM } from "./coordinateUtils"; // Utility function for conversion
 
 // Fix for default icon path issues
 delete L.Icon.Default.prototype._getIconUrl;
@@ -31,7 +32,8 @@ const DashboardPage = () => {
   const [isMapReady, setIsMapReady] = useState(false); // Track if the map is ready
   const [searchResults, setSearchResults] = useState([]);
   const mapRef = useRef(null); // Ref to store the map object
-  const [coordinates, setCoordinates] = useState(null);
+  const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
+  const [coordinateType, setCoordinateType] = useState("WGS84");
 
   // Predefined regions within Algeria
   const predefinedRegions = [
@@ -257,6 +259,15 @@ const DashboardPage = () => {
     return null;
   };
 
+  const displayCoordinates = () => {
+    if (!coordinates) return "";
+    if (coordinateType === "UTM") {
+      const utmCoords = convertToUTM(coordinates.lat, coordinates.lng);
+      return `${utmCoords.easting}, ${utmCoords.northing} (Zone ${utmCoords.zone})`;
+    }
+    return `${coordinates.lat.toFixed(6)}, ${coordinates.lng.toFixed(6)}`;
+  };
+
   return (
     <div>
       <Navbar />
@@ -348,9 +359,11 @@ const DashboardPage = () => {
           isSidebarOpen={isSidebarOpen}
           toggleSidebar={toggleSidebar}
           isMapReady={isMapReady}
+          coordinateType={coordinateType}
+          setCoordinateType={setCoordinateType}
         />
 
-        <CoordinatesDisplay coordinates={coordinates} />
+        <CoordinatesDisplay coordinates={displayCoordinates()} />
       </main>
     </div>
   );

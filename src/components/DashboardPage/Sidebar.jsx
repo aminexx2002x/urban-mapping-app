@@ -3,7 +3,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import the expan
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'; // Import the collapse icon
 import "./Sidebar.css"; // Import custom CSS for Sidebar
 
-const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expandedWilaya, toggleWilayaCommunes, focusOnRegion, isSidebarOpen, toggleSidebar }) => {
+const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expandedWilaya, toggleWilayaCommunes, focusOnRegion, isSidebarOpen, toggleSidebar, coordinateType, setCoordinateType }) => {
   const [coordinateSystem, setCoordinateSystem] = useState("WGS84");
 
   return (
@@ -63,9 +63,11 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
         <button onClick={toggleSidebar}>
           {isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
         </button>
+        <label htmlFor="coordinateType"></label>
         <select
-          value={coordinateSystem}
-          onChange={(e) => setCoordinateSystem(e.target.value)}
+          id="coordinateType"
+          value={coordinateType}
+          onChange={(e) => setCoordinateType(e.target.value)}
         >
           <option value="WGS84">WGS84</option>
           <option value="UTM">UTM</option>
