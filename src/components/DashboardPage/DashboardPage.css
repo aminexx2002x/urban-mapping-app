@@ -183,3 +183,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Add these styles for the boundary highlighting */
+.boundary-highlight {
+  animation: boundaryPulse 2s infinite;
+}
+
+@keyframes boundaryPulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.4; }
+}

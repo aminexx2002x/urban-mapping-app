@@ -9,3 +9,5 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// This would show how your app is initialized and if any providers are set up

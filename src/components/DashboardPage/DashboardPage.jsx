@@ -5,10 +5,8 @@ import { EditControl } from "react-leaflet-draw";
 import axios from "axios"; // For HTTP requests
 import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet/dist/leaflet.css";
-import "leaflet-search/src/leaflet-search.css"; // Search plugin CSS
 import "./DashboardPage.css";
 import Navbar from "../Navbar/Navbar"; // Correct path for Navbar
-import "leaflet-search"; // Import Leaflet Search plugin
 import Sidebar from "./Sidebar"; // Import Sidebar component
 import SearchBar from "./SearchBar"; // Import SearchBar component
 import sidebarButtonIcon from "../../assets/tools/sidebar_button.svg"; // Import the SVG icon
@@ -24,6 +22,11 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
+const handleGeoJSONError = (error) => {
+  console.error('GeoJSON Error:', error);
+  return null;
+};
+
 const DashboardPage = () => {
   const [drawnItems, setDrawnItems] = useState(new L.FeatureGroup());
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar is open by default
@@ -34,55 +37,56 @@ const DashboardPage = () => {
   const mapRef = useRef(null); // Ref to store the map object
   const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
   const [coordinateType, setCoordinateType] = useState("WGS84");
+  const [currentBoundaryLayer, setCurrentBoundaryLayer] = useState(null);
 
   // Predefined regions within Algeria
   const predefinedRegions = [
-    {
-      name: "Administrative Regions",
-      coordinates: [28.0339, 1.6596],
-      zoom: 6,
-      subRegions: [
-        {
-          name: "Wilayas",
-          coordinates: [36.7528, 3.0588],
-          zoom: 10,
-          communes: [
-            { name: "Algiers", coordinates: [36.7528, 3.0588], zoom: 13 },
-            { name: "Oran", coordinates: [35.6971, -0.6308], zoom: 13 },
-            { name: "Tamanrasset", coordinates: [22.785, 5.5228], zoom: 13 },
-            { name: "Constantine", coordinates: [36.365, 6.6147], zoom: 13 },
-            // Add more Wilayas as needed
-          ],
-        },
-        {
-          name: "Dairas",
-          coordinates: [36.7528, 3.0588],
-          zoom: 10,
-          communes: [
-            // Add Dairas here
-          ],
-        },
-        {
-          name: "Communes",
-          coordinates: [36.7528, 3.0588],
-          zoom: 10,
-          communes: [
-            // Add Communes here
-          ],
-        },
-      ],
-    },
-    {
-      name: "Geographical Zones",
-      coordinates: [27.7000, 0.2833],
-      zoom: 6,
-      subRegions: [
-        { name: "Sahara Desert Zones", coordinates: [27.7000, 0.2833], zoom: 6 },
-        { name: "Mountain Ranges", coordinates: [35.5559, 6.1741], zoom: 6 },
-        { name: "Plateaus", coordinates: [34.5559, 5.1741], zoom: 6 },
-        { name: "Coastal Areas", coordinates: [36.7528, 3.0588], zoom: 6 },
-      ],
-    },
+    // {
+    //   name: "--Administrative Regions",
+    //   coordinates: [28.0339, 1.6596],
+    //   zoom: 6,
+    //   subRegions: [
+    //     {
+    //       name: "Wilayas",
+    //       coordinates: [36.7528, 3.0588],
+    //       zoom: 10,
+    //       communes: [
+    //         { name: "Algiers", coordinates: [36.7528, 3.0588], zoom: 13 },
+    //         { name: "Oran", coordinates: [35.6971, -0.6308], zoom: 13 },
+    //         { name: "Tamanrasset", coordinates: [22.785, 5.5228], zoom: 13 },
+    //         { name: "Constantine", coordinates: [36.365, 6.6147], zoom: 13 },
+    //         // Add more Wilayas as needed
+    //       ],
+    //     },
+    //     {
+    //       name: "Dairas",
+    //       coordinates: [36.7528, 3.0588],
+    //       zoom: 10,
+    //       communes: [
+    //         // Add Dairas here
+    //       ],
+    //     },
+    //     {
+    //       name: "Communes",
+    //       coordinates: [36.7528, 3.0588],
+    //       zoom: 10,
+    //       communes: [
+    //         // Add Communes here
+    //       ],
+    //     },
+    //   ],
+    // },
+    // {
+    //   name: "--Geographical Zones",
+    //   coordinates: [27.7000, 0.2833],
+    //   zoom: 6,
+    //   subRegions: [
+    //     { name: "Sahara Desert Zones", coordinates: [27.7000, 0.2833], zoom: 6 },
+    //     { name: "Mountain Ranges", coordinates: [35.5559, 6.1741], zoom: 6 },
+    //     { name: "Plateaus", coordinates: [34.5559, 5.1741], zoom: 6 },
+    //     { name: "Coastal Areas", coordinates: [36.7528, 3.0588], zoom: 6 },
+    //   ],
+    // },
     {
       name: "Environmental and Ecological Regions",
       coordinates: [36.7528, 3.0588],
@@ -176,14 +180,6 @@ const DashboardPage = () => {
       const map = mapRef.current;
       map.addLayer(drawnItems);
 
-      const searchControl = new L.Control.Search({
-        layer: drawnItems,
-        initial: false,
-        zoom: 15,
-        marker: false,
-      });
-      map.addControl(searchControl);
-
       // Fetch GeoJSON data (countries, cities, etc.)
       fetchGeoJSONData(map);
 
@@ -219,15 +215,46 @@ const DashboardPage = () => {
   };
 
   // Function to focus on a predefined region
-  const focusOnRegion = (coordinates, zoom) => {
-    if (mapRef.current) {
-      console.log("Flying to:", coordinates, "with zoom:", zoom); // Debugging
-      mapRef.current.flyTo(coordinates, zoom, {
+  const focusOnRegion = (coordinates, zoom, boundaryData = null) => {
+    console.log('focusOnRegion called with:', coordinates, zoom);
+    
+    if (!mapRef.current) {
+      console.error('Map reference is not available');
+      return;
+    }
+
+    try {
+      // Remove previous boundary if it exists
+      if (currentBoundaryLayer) {
+        mapRef.current.removeLayer(currentBoundaryLayer);
+      }
+
+      // Add new boundary if provided
+      if (boundaryData) {
+        const boundaryLayer = L.geoJSON(boundaryData, {
+          style: {
+            color: 'white',
+            weight: 4,
+            opacity: 1,
+            fillColor: '#ff7800',
+            fillOpacity: 0.2,
+            dashArray: '',
+            lineCap: 'round',
+            lineJoin: 'round'
+          }
+        }, { onError: handleGeoJSONError }).addTo(mapRef.current);
+        
+        console.log('Boundary layer added:', boundaryLayer);
+        setCurrentBoundaryLayer(boundaryLayer);
+      }
+
+      // Fly to location
+      mapRef.current.setView(coordinates, zoom, {
         animate: true,
-        duration: 1.5, // Duration of the fly-to animation in seconds
-      }); // Smoothly fly to the region
-    } else {
-      console.error("Map is not initialized!"); // Debugging
+        duration: 1.5
+      });
+    } catch (error) {
+      console.error('Error in focusOnRegion:', error);
     }
   };
 
@@ -284,14 +311,15 @@ const DashboardPage = () => {
 
         <MapContainer
           className="map-container"
-          center={[28.0339, 1.6596]} // Center of Algeria
-          zoom={6} // Zoom level to show all of Algeria
-          style={{ flex: 1 }}
-          whenCreated={(map) => {
-            mapRef.current = map; // Store the map object in the ref
-            setIsMapReady(true); // Mark the map as ready
+          center={[28.0339, 1.6596]}
+          zoom={6}
+          ref={mapRef}
+          whenReady={(map) => {
+            console.log('Map is ready');
+            mapRef.current = map.target;
+            setIsMapReady(true);
           }}
-          zoomControl={false} // Disable default zoom control
+          zoomControl={false}
         >
           <LayersControl position="topright">
             <LayersControl.BaseLayer name="Google Satellite">

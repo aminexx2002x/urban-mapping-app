@@ -156,3 +156,131 @@
   border-color: rgb(255, 255, 255); /* Match border color with background */
   color: red; /* Change text color to red */
 }
+
+.fetch-db-btn {
+  margin: 10px 0;
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.fetch-db-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.db-regions-section {
+  margin: 10px 0;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.regions-list {
+  margin-top: 10px;
+}
+
+.loading-message {
+  padding: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+.error-message {
+  padding: 10px;
+  color: #ff0000;
+  font-size: 0.9em;
+}
+
+.sub-region-list {
+  margin-left: 15px;
+}
+
+.wilaya-option, .commune-option {
+  padding: 8px 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.wilaya-option:hover, .commune-option:hover {
+  background-color: #f0f0f0;
+}
+
+.commune-list {
+  margin-left: 20px;
+}
+
+/* Add these styles to your existing Sidebar.css */
+.daira-option {
+  padding: 8px 32px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f5f5f5;
+}
+
+.daira-option:hover {
+  background-color: #e0e0e0;
+}
+
+.admin-option {
+  padding: 8px 24px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0f0f0;
+  margin: 4px 0;
+  border-radius: 4px;
+}
+
+.admin-option:hover {
+  background-color: #e0e0e0;
+}
+
+.entity-list {
+  margin-left: 24px;
+}
+
+.entity-item {
+  padding: 6px 12px;
+  margin: 2px 0;
+  font-size: 0.9em;
+  color: #666;
+  border-left: 2px solid #ddd;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.entity-item:hover {
+  background-color: #f0f0f0;
+  color: #333;
+  border-left-color: #4CAF50;
+  padding-left: 16px;
+}
+
+.test-button {
+  margin: 10px;
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.test-button:hover {
+  background-color: #45a049;
+}
