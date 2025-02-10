@@ -194,3 +194,8 @@
   50% { opacity: 0.8; }
   100% { opacity: 0.4; }
 }
+
+/* Add this to your CSS to adjust the vertical positioning */
+.leaflet-draw.leaflet-control {
+  margin-top: 45px; /* Adjust this value as needed */
+}

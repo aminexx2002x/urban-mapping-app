@@ -3,7 +3,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import the expan
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'; // Import the collapse icon
 import "./Sidebar.css"; // Import custom CSS for Sidebar
 
-const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expandedWilaya, toggleWilayaCommunes, focusOnRegion, isSidebarOpen, toggleSidebar, coordinateType, setCoordinateType }) => {
+const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expandedWilaya, toggleWilayaCommunes, focusOnRegion, isSidebarOpen, toggleSidebar, coordinateType, setCoordinateType, handleWilayaClick }) => {
   const [coordinateSystem, setCoordinateSystem] = useState("WGS84");
   const [dbRegions, setDbRegions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -192,44 +192,6 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
     setIsCommunesExpanded(!isCommunesExpanded);
   };
 
-  const handleWilayaClick = async (wilaya) => {
-    console.log('Wilaya clicked:', wilaya);
-    
-    if (wilaya.latitude && wilaya.longitude) {
-      console.log('Flying to coordinates:', [wilaya.latitude, wilaya.longitude], wilaya.zoom_level);
-      
-      try {
-        // Fetch wilaya boundaries
-        const response = await fetch(`${API_URL}/api/wilaya-boundaries/${wilaya.id}`);
-        console.log('Boundary response:', response);
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Boundary fetch error:', errorData);
-          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-        
-        const boundaryData = await response.json();
-        console.log('Boundary data:', boundaryData);
-        
-        if (!boundaryData.geometry) {
-          console.warn('No geometry data for wilaya:', wilaya.name);
-          focusOnRegion([wilaya.latitude, wilaya.longitude], wilaya.zoom_level || 10);
-          return;
-        }
-        
-        // First fly to location with boundary
-        focusOnRegion([wilaya.latitude, wilaya.longitude], wilaya.zoom_level || 10, boundaryData);
-      } catch (error) {
-        console.error('Error fetching wilaya boundaries:', error);
-        // Still fly to location even if boundaries fetch fails
-        focusOnRegion([wilaya.latitude, wilaya.longitude], wilaya.zoom_level || 10);
-      }
-    } else {
-      console.warn('No coordinates found for wilaya:', wilaya.name);
-    }
-  };
-
   return (
     <div className={`sidebar ${isSidebarOpen ? "open" : "collapsed"}`}>
       <div className="sidebar-header">
@@ -262,10 +224,9 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
                   <div 
                     key={wilaya.id} 
                     className="entity-item"
-                    onClick={() => handleWilayaClick(wilaya)}
-                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleWilayaClick(wilaya.name)}
                   >
-                    {wilaya.name} ({wilaya.region_name})
+                    {wilaya.name}
                   </div>
                 ))}
               </div>

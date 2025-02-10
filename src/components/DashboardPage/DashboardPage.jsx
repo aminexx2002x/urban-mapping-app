@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import L from "leaflet";
-import { MapContainer, TileLayer, LayersControl, ZoomControl, FeatureGroup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, LayersControl, ZoomControl, FeatureGroup, useMapEvents, GeoJSON } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import axios from "axios"; // For HTTP requests
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -38,6 +38,8 @@ const DashboardPage = () => {
   const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
   const [coordinateType, setCoordinateType] = useState("WGS84");
   const [currentBoundaryLayer, setCurrentBoundaryLayer] = useState(null);
+  const [wilayasData, setWilayasData] = useState(null);
+  const [selectedWilaya, setSelectedWilaya] = useState(null);
 
   // Predefined regions within Algeria
   const predefinedRegions = [
@@ -295,6 +297,48 @@ const DashboardPage = () => {
     return `${coordinates.lat.toFixed(6)}, ${coordinates.lng.toFixed(6)}`;
   };
 
+  useEffect(() => {
+    fetch('/all-wilayas.geojson')  // Make sure the file is in your public folder
+      .then(response => response.json())
+      .then(data => {
+        setWilayasData(data);
+      })
+      .catch(error => console.error('Error loading GeoJSON:', error));
+  }, []);
+
+  const handleWilayaClick = (wilayaName) => {
+    console.log("Handling wilaya click for:", wilayaName);
+    
+    if (wilayasData) {
+      const wilaya = wilayasData.features.find(
+        feature => feature.properties.name.toLowerCase() === wilayaName.toLowerCase()
+      );
+      
+      if (wilaya) {
+        console.log("Found wilaya:", wilaya);
+        setSelectedWilaya(wilaya);
+        
+        // Create a GeoJSON layer and fit bounds
+        try {
+          const geoJsonLayer = L.geoJSON(wilaya);
+          const bounds = geoJsonLayer.getBounds();
+          if (mapRef.current) {
+            console.log("Fitting to bounds:", bounds);
+            mapRef.current.fitBounds(bounds);
+          } else {
+            console.error("Map reference not available");
+          }
+        } catch (error) {
+          console.error("Error processing wilaya geometry:", error);
+        }
+      } else {
+        console.error("Wilaya not found:", wilayaName);
+      }
+    } else {
+      console.error("GeoJSON data not loaded yet");
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -321,7 +365,7 @@ const DashboardPage = () => {
           }}
           zoomControl={false}
         >
-          <LayersControl position="topright">
+          <LayersControl position="topleft">
             <LayersControl.BaseLayer name="Google Satellite">
               <TileLayer
                 url="http://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
@@ -354,7 +398,7 @@ const DashboardPage = () => {
           {/* Polygon Drawing Tool */}
           <FeatureGroup>
             <EditControl
-              position="topright"
+              position="topleft"
               onCreated={(e) => {
                 const layer = e.layer;
                 drawnItems.addLayer(layer);
@@ -374,6 +418,58 @@ const DashboardPage = () => {
             />
           </FeatureGroup>
 
+          {wilayasData && (
+            <>
+              {/* Invisible layer for click detection */}
+              <GeoJSON
+                data={wilayasData}
+                style={() => ({
+                  color: '#3388ff',
+                  weight: 0,
+                  fillOpacity: 0,
+                  opacity: 0
+                })}
+                onEachFeature={(feature, layer) => {
+                  layer.on({
+                    click: () => {
+                      handleWilayaClick(feature.properties.name);
+                    },
+                    mouseover: (e) => {
+                      const layer = e.target;
+                      layer.setStyle({
+                        weight: 1,
+                        color: '#666',
+                        fillOpacity: 0.1,
+                        opacity: 0.3
+                      });
+                    },
+                    mouseout: (e) => {
+                      const layer = e.target;
+                      layer.setStyle({
+                        weight: 0,
+                        fillOpacity: 0,
+                        opacity: 0
+                      });
+                    }
+                  });
+                }}
+              />
+              
+              {/* Show only the selected wilaya */}
+              {selectedWilaya && (
+                <GeoJSON
+                  data={selectedWilaya}
+                  style={{
+                    color: '#ff0000',
+                    weight: 3,
+                    fillOpacity: 0.3,
+                    fillColor: '#ff0000'
+                  }}
+                />
+              )}
+            </>
+          )}
+
           <MapEvents />
         </MapContainer>
 
@@ -389,6 +485,7 @@ const DashboardPage = () => {
           isMapReady={isMapReady}
           coordinateType={coordinateType}
           setCoordinateType={setCoordinateType}
+          handleWilayaClick={handleWilayaClick}
         />
 
         <CoordinatesDisplay coordinates={displayCoordinates()} />
