@@ -5,8 +5,10 @@ import { EditControl } from "react-leaflet-draw";
 import axios from "axios"; // For HTTP requests
 import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet/dist/leaflet.css";
+import "leaflet-search/src/leaflet-search.css"; // Search plugin CSS
 import "./DashboardPage.css";
 import Navbar from "../Navbar/Navbar"; // Correct path for Navbar
+import "leaflet-search"; // Import Leaflet Search plugin
 import Sidebar from "./Sidebar"; // Import Sidebar component
 import SearchBar from "./SearchBar"; // Import SearchBar component
 import sidebarButtonIcon from "../../assets/tools/sidebar_button.svg"; // Import the SVG icon
@@ -28,7 +30,6 @@ const handleGeoJSONError = (error) => {
 };
 
 const DashboardPage = () => {
-  const [drawnItems, setDrawnItems] = useState(new L.FeatureGroup());
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar is open by default
   const [expandedRegion, setExpandedRegion] = useState(null); // Track which region is expanded
   const [expandedWilaya, setExpandedWilaya] = useState(null); // Track which Wilaya is expanded
@@ -41,60 +42,29 @@ const DashboardPage = () => {
   const [wilayasData, setWilayasData] = useState(null);
   const [selectedWilaya, setSelectedWilaya] = useState(null);
 
-  // Predefined regions within Algeria
+  // Remove the drawItems state and MapDrawTools component
+  const [editableFG] = useState(new L.FeatureGroup());
+
+  // Update the predefinedRegions array to include actual wilaya names
   const predefinedRegions = [
-    // {
-    //   name: "--Administrative Regions",
-    //   coordinates: [28.0339, 1.6596],
-    //   zoom: 6,
-    //   subRegions: [
-    //     {
-    //       name: "Wilayas",
-    //       coordinates: [36.7528, 3.0588],
-    //       zoom: 10,
-    //       communes: [
-    //         { name: "Algiers", coordinates: [36.7528, 3.0588], zoom: 13 },
-    //         { name: "Oran", coordinates: [35.6971, -0.6308], zoom: 13 },
-    //         { name: "Tamanrasset", coordinates: [22.785, 5.5228], zoom: 13 },
-    //         { name: "Constantine", coordinates: [36.365, 6.6147], zoom: 13 },
-    //         // Add more Wilayas as needed
-    //       ],
-    //     },
-    //     {
-    //       name: "Dairas",
-    //       coordinates: [36.7528, 3.0588],
-    //       zoom: 10,
-    //       communes: [
-    //         // Add Dairas here
-    //       ],
-    //     },
-    //     {
-    //       name: "Communes",
-    //       coordinates: [36.7528, 3.0588],
-    //       zoom: 10,
-    //       communes: [
-    //         // Add Communes here
-    //       ],
-    //     },
-    //   ],
-    // },
-    // {
-    //   name: "--Geographical Zones",
-    //   coordinates: [27.7000, 0.2833],
-    //   zoom: 6,
-    //   subRegions: [
-    //     { name: "Sahara Desert Zones", coordinates: [27.7000, 0.2833], zoom: 6 },
-    //     { name: "Mountain Ranges", coordinates: [35.5559, 6.1741], zoom: 6 },
-    //     { name: "Plateaus", coordinates: [34.5559, 5.1741], zoom: 6 },
-    //     { name: "Coastal Areas", coordinates: [36.7528, 3.0588], zoom: 6 },
-    //   ],
-    // },
     {
       name: "Environmental and Ecological Regions",
       coordinates: [36.7528, 3.0588],
       zoom: 6,
       subRegions: [
-        { name: "National Parks", coordinates: [36.7528, 3.0588], zoom: 6 },
+        { 
+          name: "Coastal Areas",
+          coordinates: [36.7528, 3.0588],
+          zoom: 6,
+          communes: [
+            { name: "Alger", coordinates: [36.7528, 3.0588], zoom: 10 },
+            { name: "Oran", coordinates: [35.6969, -0.6331], zoom: 10 },
+            { name: "Annaba", coordinates: [36.9142, 7.7427], zoom: 10 },
+            { name: "Bejaia", coordinates: [36.7515, 5.0557], zoom: 10 },
+            { name: "Skikda", coordinates: [36.8715, 6.9075], zoom: 10 },
+            { name: "Tipaza", coordinates: [36.5892, 2.4483], zoom: 10 }
+          ]
+        },
         { name: "Wetlands", coordinates: [36.3654, 6.6147], zoom: 6 },
         { name: "Forested Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
       ],
@@ -128,27 +98,7 @@ const DashboardPage = () => {
         { name: "Drought-Prone Areas", coordinates: [36.3654, 6.6147], zoom: 6 },
         { name: "Flood Risk Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
       ],
-    },
-    {
-      name: "Historical and Cultural Regions",
-      coordinates: [36.7528, 3.0588],
-      zoom: 6,
-      subRegions: [
-        { name: "UNESCO Heritage Sites", coordinates: [36.7528, 3.0588], zoom: 6 },
-        { name: "Historical Trade Routes", coordinates: [36.3654, 6.6147], zoom: 6 },
-        { name: "Cultural Clusters", coordinates: [36.3654, 6.6147], zoom: 6 },
-      ],
-    },
-    {
-      name: "Customized and User-Defined Regions",
-      coordinates: [36.7528, 3.0588],
-      zoom: 6,
-      subRegions: [
-        { name: "Satellite Data Coverage", coordinates: [36.7528, 3.0588], zoom: 6 },
-        { name: "Buffer Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
-        { name: "Conflict or Disaster Zones", coordinates: [36.3654, 6.6147], zoom: 6 },
-      ],
-    },
+    }
   ];
 
   const handleSearch = async (searchTerm) => {
@@ -180,17 +130,17 @@ const DashboardPage = () => {
   useEffect(() => {
     if (mapRef.current && isMapReady) {
       const map = mapRef.current;
-      map.addLayer(drawnItems);
+      map.addLayer(editableFG);
 
-      // Fetch GeoJSON data (countries, cities, etc.)
-      fetchGeoJSONData(map);
-
-      // Disable right-click context menu on the map
       map.getContainer().addEventListener('contextmenu', (e) => {
         e.preventDefault();
       });
+
+      return () => {
+        map.removeLayer(editableFG);
+      };
     }
-  }, [drawnItems, isMapReady]);
+  }, [isMapReady, editableFG]);
 
   // Function to fetch GeoJSON data
   const fetchGeoJSONData = async (map) => {
@@ -216,47 +166,15 @@ const DashboardPage = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Function to focus on a predefined region
-  const focusOnRegion = (coordinates, zoom, boundaryData = null) => {
-    console.log('focusOnRegion called with:', coordinates, zoom);
-    
-    if (!mapRef.current) {
-      console.error('Map reference is not available');
-      return;
-    }
-
-    try {
-      // Remove previous boundary if it exists
-      if (currentBoundaryLayer) {
-        mapRef.current.removeLayer(currentBoundaryLayer);
+  // Update the focusOnRegion function to handle wilaya selection
+  const focusOnRegion = (coordinates, zoom, wilayaName) => {
+    if (mapRef.current) {
+      mapRef.current.flyTo(coordinates, zoom);
+      
+      // If a wilaya name is provided, trigger the selection
+      if (wilayaName) {
+        handleWilayaClick(wilayaName);
       }
-
-      // Add new boundary if provided
-      if (boundaryData) {
-        const boundaryLayer = L.geoJSON(boundaryData, {
-          style: {
-            color: 'white',
-            weight: 4,
-            opacity: 1,
-            fillColor: '#ff7800',
-            fillOpacity: 0.2,
-            dashArray: '',
-            lineCap: 'round',
-            lineJoin: 'round'
-          }
-        }, { onError: handleGeoJSONError }).addTo(mapRef.current);
-        
-        console.log('Boundary layer added:', boundaryLayer);
-        setCurrentBoundaryLayer(boundaryLayer);
-      }
-
-      // Fly to location
-      mapRef.current.setView(coordinates, zoom, {
-        animate: true,
-        duration: 1.5
-      });
-    } catch (error) {
-      console.error('Error in focusOnRegion:', error);
     }
   };
 
@@ -298,35 +216,43 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    fetch('/all-wilayas.geojson')  // Make sure the file is in your public folder
+    fetch('/all-wilayas.geojson')
       .then(response => response.json())
       .then(data => {
+        console.log("Loaded GeoJSON data:", data);
+        console.log("First wilaya name:", data.features[0].properties.name);
         setWilayasData(data);
       })
       .catch(error => console.error('Error loading GeoJSON:', error));
   }, []);
 
   const handleWilayaClick = (wilayaName) => {
-    console.log("Handling wilaya click for:", wilayaName);
+    console.log("Clicking wilaya:", wilayaName);
+    console.log("WilayasData loaded?", !!wilayasData);
     
     if (wilayasData) {
+      const wilayaNames = wilayasData.features.map(f => f.properties.name);
+      console.log("All wilaya names:", wilayaNames);
+      
       const wilaya = wilayasData.features.find(
-        feature => feature.properties.name.toLowerCase() === wilayaName.toLowerCase()
+        feature => {
+          console.log("Comparing:", {
+            clicked: wilayaName.toLowerCase(),
+            current: feature.properties.name.toLowerCase()
+          });
+          return feature.properties.name.toLowerCase() === wilayaName.toLowerCase();
+        }
       );
       
       if (wilaya) {
         console.log("Found wilaya:", wilaya);
-        setSelectedWilaya(wilaya);
+        setSelectedWilaya(selectedWilaya === wilaya ? null : wilaya);
         
-        // Create a GeoJSON layer and fit bounds
         try {
           const geoJsonLayer = L.geoJSON(wilaya);
           const bounds = geoJsonLayer.getBounds();
           if (mapRef.current) {
-            console.log("Fitting to bounds:", bounds);
             mapRef.current.fitBounds(bounds);
-          } else {
-            console.error("Map reference not available");
           }
         } catch (error) {
           console.error("Error processing wilaya geometry:", error);
@@ -365,7 +291,7 @@ const DashboardPage = () => {
           }}
           zoomControl={false}
         >
-          <LayersControl position="topleft">
+          <LayersControl position="topright">
             <LayersControl.BaseLayer name="Google Satellite">
               <TileLayer
                 url="http://mt0.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
@@ -395,79 +321,41 @@ const DashboardPage = () => {
           {/* Custom Zoom Control at the Bottom */}
           <ZoomControl position="bottomright" />
 
-          {/* Polygon Drawing Tool */}
+          {/* Drawing Tools */}
           <FeatureGroup>
             <EditControl
               position="topleft"
-              onCreated={(e) => {
-                const layer = e.layer;
-                drawnItems.addLayer(layer);
+              onMounted={(drawControl) => {
+                // Optionally store the draw control if needed
+                console.log('Draw control mounted:', drawControl);
               }}
               draw={{
                 rectangle: true,
                 circle: true,
+                marker: true,
                 polyline: true,
                 polygon: true,
-                marker: true,
-                circlemarker: true,
+                circlemarker: false, // Usually not needed
               }}
               edit={{
-                featureGroup: drawnItems,
-                remove: true,
+                featureGroup: editableFG,
+                edit: true,
+                remove: true
               }}
             />
           </FeatureGroup>
 
+          {/* Wilaya Selection */}
           {wilayasData && (
-            <>
-              {/* Invisible layer for click detection */}
-              <GeoJSON
-                data={wilayasData}
-                style={() => ({
-                  color: '#3388ff',
-                  weight: 0,
-                  fillOpacity: 0,
-                  opacity: 0
-                })}
-                onEachFeature={(feature, layer) => {
-                  layer.on({
-                    click: () => {
-                      handleWilayaClick(feature.properties.name);
-                    },
-                    mouseover: (e) => {
-                      const layer = e.target;
-                      layer.setStyle({
-                        weight: 1,
-                        color: '#666',
-                        fillOpacity: 0.1,
-                        opacity: 0.3
-                      });
-                    },
-                    mouseout: (e) => {
-                      const layer = e.target;
-                      layer.setStyle({
-                        weight: 0,
-                        fillOpacity: 0,
-                        opacity: 0
-                      });
-                    }
-                  });
-                }}
-              />
-              
-              {/* Show only the selected wilaya */}
-              {selectedWilaya && (
-                <GeoJSON
-                  data={selectedWilaya}
-                  style={{
-                    color: '#ff0000',
-                    weight: 3,
-                    fillOpacity: 0.3,
-                    fillColor: '#ff0000'
-                  }}
-                />
-              )}
-            </>
+            <GeoJSON
+              data={wilayasData}
+              style={(feature) => ({
+                color: feature === selectedWilaya ? '#3388ff' : 'transparent',
+                weight: feature === selectedWilaya ? 2 : 0,
+                fillOpacity: feature === selectedWilaya ? 0.2 : 0,
+                fillColor: feature === selectedWilaya ? '#3388ff' : 'transparent'
+              })}
+            />
           )}
 
           <MapEvents />

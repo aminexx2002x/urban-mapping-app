@@ -10,12 +10,53 @@
   margin: 0;
   padding: 0;
 }
-/* Move the layer control to the left with a margin-top of 10px */
-.leaflet-control-layers {
-  margin-top: 70px !important; /* Add margin to the top */
-  margin-left: 10px !important; /* Add margin to the left */
-
+/* Move layer controls and draw controls to the left */
+.leaflet-top.leaflet-right {
+  /* left: 10px !important; */
+  right: auto !important;
 }
+
+/* Adjust the layer control position */
+.leaflet-control-layers {
+  margin-top: 70px !important;
+  margin-left: 10px !important;
+}
+
+/* Position draw control below layer control */
+.leaflet-draw.leaflet-control {
+  margin-top: 140px !important; /* Increased top margin to position below layer control */
+  margin-left: 10px !important;
+}
+
+/* Ensure proper stacking */
+.leaflet-control-layers {
+  z-index: 1000 !important;
+}
+
+.leaflet-draw.leaflet-control {
+  z-index: 999 !important;
+}
+
+/* Remove the large gap between toolbar and edit controls */
+.leaflet-draw-section {
+  margin-bottom: 0 !important;
+}
+
+/* Position edit/delete controls */
+.leaflet-draw-toolbar.leaflet-bar + .leaflet-draw-toolbar.leaflet-bar {
+  margin-top: 5px !important;
+}
+
+/* Ensure controls don't overlap with other elements */
+.leaflet-left .leaflet-control {
+  margin-left: 10px !important;
+}
+
+/* Optional: Adjust spacing between controls */
+.leaflet-control {
+  clear: both !important;
+}
+
 /* Sidebar on the Right */
 .sidebar {
   width: 300px;
@@ -193,9 +234,4 @@
   0% { opacity: 0.4; }
   50% { opacity: 0.8; }
   100% { opacity: 0.4; }
-}
-
-/* Add this to your CSS to adjust the vertical positioning */
-.leaflet-draw.leaflet-control {
-  margin-top: 45px; /* Adjust this value as needed */
 }

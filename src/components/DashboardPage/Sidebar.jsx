@@ -263,7 +263,21 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
                 {isLoading && <div className="loading-message">Loading communes...</div>}
                 {error && <div className="error-message">{error}</div>}
                 {communes.map(commune => (
-                  <div key={commune.id} className="entity-item">
+                  <div
+                    key={commune.id}
+                    className="entity-item"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const communeName = commune.name;
+                      console.log("Clicking commune in sidebar:", {
+                        communeName,
+                        coordinates: commune.coordinates,
+                        zoom: commune.zoom
+                      });
+                      handleWilayaClick(communeName);
+                      focusOnRegion(commune.coordinates, commune.zoom);
+                    }}
+                  >
                     {commune.name} ({commune.daira_name})
                   </div>
                 ))}
@@ -295,7 +309,15 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
                 {expandedDbWilaya === region.id && region.wilayas && (
                   <div className="commune-list">
                     {region.wilayas.map((wilaya) => (
-                      <div key={wilaya.id} className="commune-option">
+                      <div 
+                        key={wilaya.id} 
+                        className="commune-option"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleWilayaClick(wilaya.name);
+                          focusOnRegion([wilaya.latitude || 36.7528, wilaya.longitude || 3.0588], 10);
+                        }}
+                      >
                         {wilaya.name}
                       </div>
                     ))}
@@ -334,13 +356,23 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
                         {expandedWilaya === subRegion.name ? <ExpandMoreIcon /> : <ChevronRightIcon />}
                       </span>
                     </div>
-                    {expandedWilaya === subRegion.name && (
+                    {expandedWilaya === subRegion.name && subRegion.communes && (
                       <div className="commune-list">
                         {subRegion.communes.map((commune, communeIndex) => (
                           <div
                             key={communeIndex}
                             className="commune-option"
-                            onClick={() => focusOnRegion(commune.coordinates, commune.zoom)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const communeName = commune.name;
+                              console.log("Clicking commune in sidebar:", {
+                                communeName,
+                                coordinates: commune.coordinates,
+                                zoom: commune.zoom
+                              });
+                              handleWilayaClick(communeName);
+                              focusOnRegion(commune.coordinates, commune.zoom);
+                            }}
                           >
                             {commune.name}
                           </div>
