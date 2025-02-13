@@ -315,7 +315,6 @@ const Sidebar = ({ predefinedRegions, expandedRegion, toggleSubRegions, expanded
                         onClick={(e) => {
                           e.stopPropagation();
                           handleWilayaClick(wilaya.name);
-                          focusOnRegion([wilaya.latitude || 36.7528, wilaya.longitude || 3.0588], 10);
                         }}
                       >
                         {wilaya.name}
