@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { Pool } = require('pg');
 
+// Database connection pool
 const pool = new Pool({
   user: process.env.DB_USER || 'odooadmin',
   host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'urban_map_app_db ',
+  database: process.env.DB_NAME || 'urban_map_app_db',
   password: process.env.DB_PASSWORD || 'admin',
   port: process.env.DB_PORT || 5432,
 });
@@ -19,10 +20,11 @@ pool.connect((err, client, release) => {
   release();
 });
 
+// Fetch all regions
 router.get('/regions', async (req, res) => {
   try {
     console.log('Fetching regions...');
-    const result = await pool.query(`
+    const query = `
       SELECT r.id, r.name, 
         COALESCE(json_agg(
           CASE WHEN w.id IS NOT NULL 
@@ -34,19 +36,17 @@ router.get('/regions', async (req, res) => {
       LEFT JOIN wilayas w ON w.region_id = r.id
       GROUP BY r.id, r.name
       ORDER BY r.name
-    `);
-    
+    `;
+    const result = await pool.query(query);
     console.log('Regions fetched:', result.rows);
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching regions:', err);
-    res.status(500).json({ 
-      error: 'Failed to fetch regions',
-      details: err.message 
-    });
+    res.status(500).json({ error: 'Failed to fetch regions', details: err.message });
   }
 });
 
+// Fetch all wilayas
 router.get('/wilayas', async (req, res) => {
   try {
     console.log('Fetching wilayas...');
@@ -63,61 +63,54 @@ router.get('/wilayas', async (req, res) => {
       JOIN regions r ON r.id = w.region_id
       ORDER BY w.name
     `;
-    
-    const { rows } = await pool.query(query);
-    console.log('Wilayas fetched:', rows);
-    res.json(rows);
-  } catch (error) {
-    console.error('Error fetching wilayas:', error);
-    res.status(500).json({ 
-      error: 'Failed to fetch wilayas',
-      details: error.message 
-    });
+    const result = await pool.query(query);
+    console.log('Wilayas fetched:', result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching wilayas:', err);
+    res.status(500).json({ error: 'Failed to fetch wilayas', details: err.message });
   }
 });
 
+// Fetch all dairas
 router.get('/dairas', async (req, res) => {
   try {
     console.log('Fetching dairas...');
-    const result = await pool.query(`
+    const query = `
       SELECT d.id, d.name, d.wilaya_id, w.name as wilaya_name
       FROM dairas d
       JOIN wilayas w ON w.id = d.wilaya_id
       ORDER BY d.name
-    `);
-    
+    `;
+    const result = await pool.query(query);
     console.log('Dairas fetched:', result.rows);
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching dairas:', err);
-    res.status(500).json({ 
-      error: 'Failed to fetch dairas',
-      details: err.message 
-    });
+    res.status(500).json({ error: 'Failed to fetch dairas', details: err.message });
   }
 });
 
+// Fetch all communes
 router.get('/communes', async (req, res) => {
   try {
     console.log('Fetching communes...');
-    const result = await pool.query(`
+    const query = `
       SELECT c.id, c.name, c.daira_id, d.name as daira_name
       FROM communes c
       JOIN dairas d ON d.id = c.daira_id
       ORDER BY c.name
-    `);
-    
+    `;
+    const result = await pool.query(query);
     console.log('Communes fetched:', result.rows);
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching communes:', err);
-    res.status(500).json({ 
-      error: 'Failed to fetch communes',
-      details: err.message 
-    });
+    res.status(500).json({ error: 'Failed to fetch communes', details: err.message });
   }
 });
 
+// Fetch administrative regions
 router.get('/administrative-regions', async (req, res) => {
   try {
     console.log('Fetching administrative regions...');
@@ -150,88 +143,68 @@ router.get('/administrative-regions', async (req, res) => {
       GROUP BY r.id, r.name
       ORDER BY r.name;
     `;
-    
-    const { rows } = await pool.query(query);
-    console.log('Administrative regions fetched:', rows);
-    res.json(rows);
+    const result = await pool.query(query);
+    console.log('Administrative regions fetched:', result.rows);
+    res.json(result.rows);
   } catch (err) {
     console.error('Error fetching administrative regions:', err);
-    res.status(500).json({ 
-      error: 'Failed to fetch administrative regions',
-      details: err.message 
-    });
+    res.status(500).json({ error: 'Failed to fetch administrative regions', details: err.message });
   }
 });
 
+// Fetch wilaya boundaries
 router.get('/wilaya-boundaries/:id', async (req, res) => {
   try {
     const wilayaId = req.params.id;
     console.log('Fetching boundaries for wilaya ID:', wilayaId);
-    
-    // First check if the wilaya exists
-    const checkQuery = `
-      SELECT id, name 
-      FROM wilayas 
-      WHERE id = $1`;
-    
+
+    // Check if the wilaya exists
+    const checkQuery = `SELECT id, name FROM wilayas WHERE id = $1`;
     const wilayaCheck = await pool.query(checkQuery, [wilayaId]);
-    console.log('Wilaya exists:', wilayaCheck.rows);
 
     if (wilayaCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Wilaya not found' });
     }
 
-    // Then get the geometry
+    // Fetch the geometry
     const query = `
       SELECT 
         w.id,
         w.name,
         ST_AsGeoJSON(ST_Transform(w.geom, 4326))::json as geometry
       FROM wilayas w
-      WHERE w.id = $1 AND w.geom IS NOT NULL`;
-    
-    const { rows } = await pool.query(query, [wilayaId]);
-    console.log('Query result:', rows);
-    
-    if (rows.length > 0 && rows[0].geometry) {
+      WHERE w.id = $1 AND w.geom IS NOT NULL
+    `;
+    const result = await pool.query(query, [wilayaId]);
+
+    if (result.rows.length > 0 && result.rows[0].geometry) {
       const response = {
         type: 'Feature',
         properties: {
-          id: rows[0].id,
-          name: rows[0].name
+          id: result.rows[0].id,
+          name: result.rows[0].name
         },
-        geometry: rows[0].geometry
+        geometry: result.rows[0].geometry
       };
       console.log('Sending boundary data:', response);
       res.json(response);
     } else {
-      // Wilaya exists but has no geometry
-      res.status(404).json({ 
-        error: 'No boundary data found for this wilaya',
-        wilayaId,
-        wilayaName: wilayaCheck.rows[0].name
-      });
+      res.status(404).json({ error: 'No boundary data found for this wilaya' });
     }
-  } catch (error) {
-    console.error('Error fetching wilaya boundaries:', error);
-    res.status(500).json({ 
-      error: 'Failed to fetch wilaya boundaries',
-      details: error.message,
-      stack: error.stack 
-    });
+  } catch (err) {
+    console.error('Error fetching wilaya boundaries:', err);
+    res.status(500).json({ error: 'Failed to fetch wilaya boundaries', details: err.message });
   }
 });
 
+// Fetch commune boundaries
 router.get('/commune-boundaries/:id', async (req, res) => {
   try {
     const communeId = req.params.id;
     console.log('Fetching boundaries for commune ID:', communeId);
 
     // Check if the commune exists
-    const checkQuery = `
-      SELECT id, name 
-      FROM communes 
-      WHERE id = $1`;
+    const checkQuery = `SELECT id, name FROM communes WHERE id = $1`;
     const communeCheck = await pool.query(checkQuery, [communeId]);
 
     if (communeCheck.rows.length === 0) {
@@ -245,33 +218,27 @@ router.get('/commune-boundaries/:id', async (req, res) => {
         c.name,
         ST_AsGeoJSON(ST_Transform(c.geom, 4326))::json as geometry
       FROM communes c
-      WHERE c.id = $1 AND c.geom IS NOT NULL`;
-    const { rows } = await pool.query(query, [communeId]);
+      WHERE c.id = $1 AND c.geom IS NOT NULL
+    `;
+    const result = await pool.query(query, [communeId]);
 
-    if (rows.length > 0 && rows[0].geometry) {
+    if (result.rows.length > 0 && result.rows[0].geometry) {
       const response = {
         type: 'Feature',
         properties: {
-          id: rows[0].id,
-          name: rows[0].name
+          id: result.rows[0].id,
+          name: result.rows[0].name
         },
-        geometry: rows[0].geometry
+        geometry: result.rows[0].geometry
       };
       console.log('Sending commune boundary data:', response);
       res.json(response);
     } else {
-      res.status(404).json({ 
-        error: 'No boundary data found for this commune',
-        communeId,
-        communeName: communeCheck.rows[0].name
-      });
+      res.status(404).json({ error: 'No boundary data found for this commune' });
     }
-  } catch (error) {
-    console.error('Error fetching commune boundaries:', error);
-    res.status(500).json({ 
-      error: 'Failed to fetch commune boundaries',
-      details: error.message 
-    });
+  } catch (err) {
+    console.error('Error fetching commune boundaries:', err);
+    res.status(500).json({ error: 'Failed to fetch commune boundaries', details: err.message });
   }
 });
 
