@@ -3,10 +3,10 @@ const router = express.Router();
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
+  user: process.env.DB_USER || 'odooadmin',
   host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'urban_map_app_db',
-  password: process.env.DB_PASSWORD || '1234',
+  database: process.env.DB_NAME || 'urban_map_app_db ',
+  password: process.env.DB_PASSWORD || 'admin',
   port: process.env.DB_PORT || 5432,
 });
 
@@ -222,4 +222,57 @@ router.get('/wilaya-boundaries/:id', async (req, res) => {
   }
 });
 
-module.exports = router; 
+router.get('/commune-boundaries/:id', async (req, res) => {
+  try {
+    const communeId = req.params.id;
+    console.log('Fetching boundaries for commune ID:', communeId);
+
+    // Check if the commune exists
+    const checkQuery = `
+      SELECT id, name 
+      FROM communes 
+      WHERE id = $1`;
+    const communeCheck = await pool.query(checkQuery, [communeId]);
+
+    if (communeCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Commune not found' });
+    }
+
+    // Fetch the geometry
+    const query = `
+      SELECT 
+        c.id,
+        c.name,
+        ST_AsGeoJSON(ST_Transform(c.geom, 4326))::json as geometry
+      FROM communes c
+      WHERE c.id = $1 AND c.geom IS NOT NULL`;
+    const { rows } = await pool.query(query, [communeId]);
+
+    if (rows.length > 0 && rows[0].geometry) {
+      const response = {
+        type: 'Feature',
+        properties: {
+          id: rows[0].id,
+          name: rows[0].name
+        },
+        geometry: rows[0].geometry
+      };
+      console.log('Sending commune boundary data:', response);
+      res.json(response);
+    } else {
+      res.status(404).json({ 
+        error: 'No boundary data found for this commune',
+        communeId,
+        communeName: communeCheck.rows[0].name
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching commune boundaries:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch commune boundaries',
+      details: error.message 
+    });
+  }
+});
+
+module.exports = router;
