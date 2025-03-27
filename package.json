@@ -22,7 +22,7 @@
     "leaflet-draw": "^1.0.4",
     "leaflet-search": "^4.0.0",
     "lucide-react": "^0.469.0",
-    "pg": "^8.13.1",
+    "pg": "^8.14.1",
     "proj4": "^2.15.0",
     "prop-types": "^15.8.1",
     "react": "18.0.0",
@@ -42,7 +42,8 @@
     "dev": "concurrently \"npm run server\" \"npm run start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "import-boundaries": "node src/scripts/import-boundaries.js"
   },
   "browserslist": {
     "production": [

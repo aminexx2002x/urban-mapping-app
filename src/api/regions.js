@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const { Pool } = require('pg');
+const axios = require('axios');
 
 // Database connection pool
 const pool = new Pool({
-  user: process.env.DB_USER || 'odooadmin',
+  user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
   database: process.env.DB_NAME || 'urban_map_app_db',
   password: process.env.DB_PASSWORD || 'admin',
   port: process.env.DB_PORT || 5432,
 });
+
+// Define API_BASE_URL using CommonJS
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 // Test database connection
 pool.connect((err, client, release) => {
@@ -46,29 +50,47 @@ router.get('/regions', async (req, res) => {
   }
 });
 
-// Fetch all wilayas
+// Fetch all wilayas with region info if available
 router.get('/wilayas', async (req, res) => {
   try {
     console.log('Fetching wilayas...');
-    const query = `
-      SELECT 
-        w.id, 
-        w.name, 
-        w.region_id, 
-        r.name as region_name,
-        w.latitude,
-        w.longitude,
-        w.zoom_level
-      FROM wilayas w
-      JOIN regions r ON r.id = w.region_id
-      ORDER BY w.name
+    
+    // First, check if the region_id column exists
+    const checkColumnQuery = `
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'wilayas' AND column_name = 'region_id'
     `;
+    const columnCheck = await pool.query(checkColumnQuery);
+    
+    let query;
+    if (columnCheck.rows.length > 0) {
+      // If region_id exists, use it to join with regions
+      query = `
+        SELECT w.id, w.name, w.region_id, r.name as region_name
+        FROM wilayas w
+        LEFT JOIN regions r ON r.id = w.region_id
+        ORDER BY w.name
+      `;
+    } else {
+      // Otherwise, just fetch wilayas without region info
+      query = `
+        SELECT w.id, w.name
+        FROM wilayas w
+        ORDER BY w.name
+      `;
+    }
+    
     const result = await pool.query(query);
     console.log('Wilayas fetched:', result.rows);
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching wilayas:', err);
-    res.status(500).json({ error: 'Failed to fetch wilayas', details: err.message });
+    res.status(500).json({ 
+      error: 'Failed to fetch wilayas', 
+      details: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 });
 
@@ -197,6 +219,35 @@ router.get('/wilaya-boundaries/:id', async (req, res) => {
   }
 });
 
+// Add this new route to fetch all wilaya boundaries
+router.get('/wilaya-boundaries', async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        w.id,
+        w.name,
+        ST_AsGeoJSON(ST_Transform(w.geom, 4326))::json as geometry
+      FROM wilayas w
+      WHERE w.geom IS NOT NULL
+    `;
+    const result = await pool.query(query);
+
+    const features = result.rows.map(row => ({
+      type: 'Feature',
+      properties: {
+        id: row.id,
+        name: row.name
+      },
+      geometry: row.geometry
+    }));
+
+    res.json(features);
+  } catch (err) {
+    console.error('Error fetching wilaya boundaries:', err);
+    res.status(500).json({ error: 'Failed to fetch wilaya boundaries', details: err.message });
+  }
+});
+
 // Fetch commune boundaries
 router.get('/commune-boundaries/:id', async (req, res) => {
   try {
@@ -239,6 +290,24 @@ router.get('/commune-boundaries/:id', async (req, res) => {
   } catch (err) {
     console.error('Error fetching commune boundaries:', err);
     res.status(500).json({ error: 'Failed to fetch commune boundaries', details: err.message });
+  }
+});
+
+// Add this route to inspect table schema
+router.get('/schema/:table', async (req, res) => {
+  try {
+    const tableName = req.params.table;
+    const query = `
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_name = $1
+      ORDER BY ordinal_position
+    `;
+    const result = await pool.query(query, [tableName]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(`Error fetching schema for ${req.params.table}:`, err);
+    res.status(500).json({ error: 'Failed to fetch schema', details: err.message });
   }
 });
 

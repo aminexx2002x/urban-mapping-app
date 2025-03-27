@@ -142,24 +142,41 @@ const DashboardPage = () => {
     }
   }, [isMapReady, editableFG]);
 
-  // Function to fetch GeoJSON data
-  const fetchGeoJSONData = async (map) => {
-    const geoJSONUrl =
-      "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/countries.geojson"; // Example URL for countries GeoJSON
-
+  // Replace the fetchGeoJSONData function with this:
+  const fetchBoundariesFromDB = async () => {
     try {
-      const response = await axios.get(geoJSONUrl);
-      const geojsonLayer = L.geoJSON(response.data, {
-        onEachFeature: (feature, layer) => {
-          layer.bindPopup(`<b>${feature.properties.name}</b>`); // Example popup showing country name
-        },
-      });
+      // First try with proxy
+      let response = await fetch('/api/wilaya-boundaries');
+      
+      // Fallback to direct URL if proxy fails
+      if (!response.ok) {
+        response = await fetch('http://localhost:5001/api/wilaya-boundaries', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
 
-      geojsonLayer.addTo(map); // Add GeoJSON data to the map
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setWilayasData({
+        type: "FeatureCollection",
+        features: data
+      });
     } catch (error) {
-      console.error("Error fetching GeoJSON data:", error);
+      console.error("Error fetching boundaries:", error);
     }
   };
+
+  // Update useEffect to use the new function
+  useEffect(() => {
+    if (mapRef.current && isMapReady) {
+      fetchBoundariesFromDB();
+    }
+  }, [isMapReady]);
 
   // Function to toggle sidebar
   const toggleSidebar = () => {
@@ -214,17 +231,6 @@ const DashboardPage = () => {
     }
     return `${coordinates.lat.toFixed(6)}, ${coordinates.lng.toFixed(6)}`;
   };
-
-  useEffect(() => {
-    fetch('/all-wilayas.geojson')
-      .then(response => response.json())
-      .then(data => {
-        console.log("Loaded GeoJSON data:", data);
-        console.log("First wilaya name:", data.features[0].properties.name);
-        setWilayasData(data);
-      })
-      .catch(error => console.error('Error loading GeoJSON:', error));
-  }, []);
 
   const handleWilayaClick = (wilayaName) => {
     console.log("Clicking wilaya:", wilayaName);
