@@ -159,7 +159,7 @@ const DashboardPage = () => {
 
         <MapContainer
           className="map-container"
-          center={[28.0339, 1.6596]}
+          center={[34.0339, 1.5896]}
           zoom={6}
           ref={mapRef}
           whenReady={(map) => {
